@@ -7,6 +7,8 @@ import java.awt.event.KeyListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import model.Audio;
+
 public class GUI extends JFrame implements KeyListener {
 
 	private static final long serialVersionUID = 1L;
@@ -15,10 +17,10 @@ public class GUI extends JFrame implements KeyListener {
 	}
 	
 	private final Keyboard keyboard;
-	
-	public GUI(int numKeys, Double startHz, Double finalHz) {
-		super("Microtonal Piano Roll :: " + numKeys + " keys :: " + startHz + "Hz - " + finalHz + "Hz");
-		keyboard = new Keyboard(numKeys, false);
+
+	public GUI(Audio audio) {		
+		super("Microtonal Piano Roll :: " + audio.keysCount() + " keys :: " + audio.lowestFrequency() + "Hz - " + audio.highestFrequency() + "Hz");
+		keyboard = new Keyboard(audio.keysCount(), false);
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(keyboard, BorderLayout.EAST);
 		setContentPane(panel);
