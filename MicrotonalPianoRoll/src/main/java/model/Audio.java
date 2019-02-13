@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class Audio {
 
-	private final SortedMap<String, Double> table = new TreeMap<>();
+	private final SortedMap<String, Double> table = new TreeMap<>(NoteNames::compare);
 	
 	/**
 	 * 
@@ -22,11 +22,10 @@ public class Audio {
 		double coefficient = Math.pow(higherFrequency / lowerFrequency, 1.0 / stepsInBetween);
 		// Move back or forward to the actual requested minimum
 		lowerFrequency = lowerFrequency * Math.pow(coefficient, lowestStepsFromLower);
-		// Generate the table of frequencies
-		String key = lowestKeyNote;
+		// Generate the table of frequencies for note names
+		String[] names = NoteNames.range(lowestKeyNote, keysCount);
 		for(int i = 0; i < keysCount; i++) {
-			table.put(key, Math.pow(coefficient, i) * lowerFrequency);
-			key = key + "+";
+			table.put(names[i], Math.pow(coefficient, i) * lowerFrequency);
 		}
 	}
 	
@@ -41,7 +40,7 @@ public class Audio {
 		this(lowestFrequency, highestFrequency, stepsInBetween, 0, stepsInBetween + 1, lowestKeyNote);
 	}
 	
-	public int keysCount() {
+	public int numEntries() {
 		return table.size();
 	}
 	
@@ -55,9 +54,8 @@ public class Audio {
 	
 	@Override
 	public String toString() {
-		return String.join("\n", 
-			table.entrySet().stream()
-			.map(entry -> entry.getKey() + "\t" + String.format("%.3f Hz", entry.getValue()))
+		return String.join("\n", table.entrySet().stream()
+			.map(entry -> entry.getKey() + "\t" + String.format("%.2f Hz", entry.getValue()))
 			.collect(Collectors.toList())
 		);
 	}

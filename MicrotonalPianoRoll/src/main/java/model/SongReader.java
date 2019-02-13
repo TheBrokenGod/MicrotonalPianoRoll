@@ -28,7 +28,7 @@ public class SongReader {
 		}
 	}
 	
-	public Song read() throws XPathExpressionException, SAXException {
+	public Song read() throws SAXException {
 		System.out.println(new Audio(
 			findDouble("number(/song/audio/lower/@hz)", true),
 			findDouble("number(/song/audio/higher/@hz)", true),

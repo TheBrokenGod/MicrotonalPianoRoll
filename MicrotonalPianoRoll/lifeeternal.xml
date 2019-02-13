@@ -4,7 +4,7 @@
         <lower hz="440"/>
         <higher hz="880"/>
         <distance steps="12"/>
-        <lowest offset="-12" note="C3"/>
+        <lowest offset="-12" note="A3"/>
         <keys count="25"/>
     </audio>
     <structure>
@@ -15,8 +15,8 @@
         <measure repeat="1"/>
     </structure>
     <instrument name="Euronymous">
-        <chord duration="1">C4 C3</chord>
-        <note duration="4">A</note>
-        <pause duration="1"/>
+        <chord length="1">C4 C3</chord>
+        <note length="4">A</note>
+        <pause length="1"/>
     </instrument>
 </song>
