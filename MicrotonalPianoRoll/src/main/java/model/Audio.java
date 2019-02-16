@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class Audio {
 
-	private final SortedMap<String, Double> table = new TreeMap<>(NoteNames::compare);
+	private final SortedMap<Integer, Double> table = new TreeMap<>();
 	
 	/**
 	 * 
@@ -17,15 +17,14 @@ public class Audio {
 	 * @param keysCount
 	 * @param lowestKeyNote
 	 */
-	public Audio(double lowerFrequency, double higherFrequency, int stepsInBetween, int lowestStepsFromLower, int keysCount, String lowestKeyNote) {
+	public Audio(double lowerFrequency, double higherFrequency, int stepsInBetween, int lowestStepsFromLower, int keysCount) {
 		// Compute the base coefficient from known informations
 		double coefficient = Math.pow(higherFrequency / lowerFrequency, 1.0 / stepsInBetween);
 		// Move back or forward to the actual requested minimum
 		lowerFrequency = lowerFrequency * Math.pow(coefficient, lowestStepsFromLower);
-		// Generate the table of frequencies for note names
-		String[] names = NoteNames.range(lowestKeyNote, keysCount);
+		// Generate the table of frequencies
 		for(int i = 0; i < keysCount; i++) {
-			table.put(names[i], Math.pow(coefficient, i) * lowerFrequency);
+			table.put(i, Math.pow(coefficient, i) * lowerFrequency);
 		}
 	}
 	
@@ -36,8 +35,8 @@ public class Audio {
 	 * @param stepsInBetween
 	 * @param lowestKeyNote
 	 */
-	public Audio(double lowestFrequency, double highestFrequency, int stepsInBetween, String lowestKeyNote) {
-		this(lowestFrequency, highestFrequency, stepsInBetween, 0, stepsInBetween + 1, lowestKeyNote);
+	public Audio(double lowestFrequency, double highestFrequency, int stepsInBetween) {
+		this(lowestFrequency, highestFrequency, stepsInBetween, 0, stepsInBetween + 1);
 	}
 	
 	public int numEntries() {
@@ -54,9 +53,8 @@ public class Audio {
 	
 	@Override
 	public String toString() {
-		return String.join("\n", table.entrySet().stream()
+		return table.entrySet().stream()
 			.map(entry -> entry.getKey() + "\t" + String.format("%.2f Hz", entry.getValue()))
-			.collect(Collectors.toList())
-		);
+			.collect(Collectors.joining("\n"));
 	}
 }

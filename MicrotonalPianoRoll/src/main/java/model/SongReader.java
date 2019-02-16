@@ -1,91 +1,125 @@
 package model;
 
 import java.io.File;
-import java.io.IOException;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import net.sf.saxon.Configuration;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.SaxonApiUncheckedException;
+import net.sf.saxon.s9api.XPathCompiler;
+import net.sf.saxon.s9api.XdmAtomicValue;
+import net.sf.saxon.s9api.XdmItem;
+import net.sf.saxon.s9api.XdmValue;
+
 public class SongReader {
-	
-	private final Document song;
-	private final XPath path;
+
+	private XPathCompiler xpath;
+	private XdmItem document;
 	
 	public SongReader(File file) throws SAXException {
+		Processor proc = new Processor(new Configuration());
+		xpath = proc.newXPathCompiler();
 		try {
-			song = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
-			path = XPathFactory.newInstance().newXPath();
+			document = proc.newDocumentBuilder().build(file);
+			document = xpath.evaluate("song", document).itemAt(0);
 		}
-		catch (ParserConfigurationException | IOException e) {
-			throw new RuntimeException(e);
+		catch(SaxonApiException | IndexOutOfBoundsException e) {
+			throw new SAXException(e);
 		}
 	}
 	
 	public Song read() throws SAXException {
-		System.out.println(new Audio(
-			findDouble("number(/song/audio/lower/@hz)", true),
-			findDouble("number(/song/audio/higher/@hz)", true),
-			findInt("number(/song/audio/distance/@steps)", true),
-			findInt("number(/song/audio/lowest/@offset)", false, 0),
-			findInt("number(/song/audio/keys/@count)", true, 0),
-			findString("/song/audio/lowest/@note")
-		));
-		return null;
-	}
-	
-	private String findString(String expression) throws SAXException {
-		return findString(expression, null);
-	}
-	
-	private String findString(String expression, String orElse) throws SAXException {
-		String string;
 		try {
-			string = (String) path.evaluate(expression, song, XPathConstants.STRING);
+			// Audio synthesis
+			Audio audio = new Audio(
+				getReal("audio/lower/@hz", 1),
+				getReal("audio/higher/@hz", 1),
+				getInt("audio/distance/@steps", 1),
+				getInt("audio/lowest/@offset", Integer.MIN_VALUE),
+				getInt("audio/keys/@count", 1)
+			);
+			Song song = new Song(audio,
+				getInt("@bpm", 1),
+				getString("@title", 0),
+				getString("@author", 0)
+			);
+			// Song tracks
+			getList("track").forEach(t -> {
+				Track track = new Track(getString("@name", t, 0));
+				// Track notes
+				getList(t, "note").forEach(n -> {
+					Note note = new Note(getInt("@length", n, 1));
+					// Note values
+					getList(n, "tokenize(text(), '\\s')").forEach(v -> {
+						note.add(getInt("", v, 0));
+					});
+					track.add(note);
+				});
+				song.add(track);
+			});
+			return song;
 		}
-		catch (XPathExpressionException e) {
-			throw new RuntimeException(e);
+		catch(SaxonApiUncheckedException e) {
+			throw new SAXException(e);
 		}
-		if(string.isEmpty() && orElse != null) {
-			return orElse;
-		}
-		else if(string.isEmpty()) {
-			throw new SAXException("XPath '" + expression + "' is empty");
-		}
-		return string;
 	}
 	
-	private double findDouble(String expression, boolean positive) throws SAXException {
-		return findDouble(expression, positive, null);
-	}
-
-	private double findDouble(String expression, boolean positive, Number orElse) throws SAXException {
-		double value;
+	private XdmValue getList(XdmItem context, String expression) {
 		try {
-			value = (double) path.evaluate(expression, song, XPathConstants.NUMBER);
+			return xpath.evaluate(expression, context);
 		} 
-		catch (XPathExpressionException e) {
+		catch(SaxonApiException e) {
 			throw new RuntimeException(e);
 		}
-		if(!Double.isFinite(value) && orElse != null) {
-			return orElse.doubleValue();
-		}
-		else if(!Double.isFinite(value) || positive && value < 0) {
-			throw new SAXException("XPath '" + expression + "' is '" + value + "'");
-		}
-		return value;
 	}
 	
-	private int findInt(String expression, boolean positive) throws SAXException {
-		return findInt(expression, positive, null);
+	private XdmValue getList(String expression) {
+		return getList(document, expression);
 	}
-	private int findInt(String expression, boolean positive, Integer orElse) throws SAXException {
-		return (int) findDouble(expression, positive, orElse);
+	
+	private String getString(String expression, XdmItem context, int minLength) {
+		expression = "string(" + expression + ")";
+		try {
+			String value = ((XdmAtomicValue)xpath.evaluate(expression, context).itemAt(0)).getStringValue();
+			if(value.length() < minLength) {
+				throw new SaxonApiException(expression);
+			}
+			return value;
+		}
+		catch(SaxonApiException e) {
+			throw new SaxonApiUncheckedException(e);
+		}
+	}
+	
+	private String getString(String expression, int minLength) {
+		return getString(expression, document, minLength);
+	}
+	
+	private int getInt(String expression, XdmItem context, int minValue) {
+		return (int) getReal(expression, context, minValue);
+	}
+	
+	private int getInt(String expression, int minValue) {
+		return getInt(expression, document, minValue);
+	}
+	
+	private double getReal(String expression, XdmItem context, double minValue) {
+		expression = "number(" + expression + ")";
+		try {
+			double value = ((XdmAtomicValue)xpath.evaluate(expression, context).itemAt(0)).getDoubleValue();	
+			if(!Double.isFinite(value) || value < minValue) {
+				throw new SaxonApiException(expression + " is " + value);
+			}
+			return value;
+		}
+		catch(SaxonApiException e) {
+			throw new SaxonApiUncheckedException(e);
+		}
+	}
+	
+	private double getReal(String expression, double minValue) {
+		return getReal(expression, document, minValue);
 	}
 }

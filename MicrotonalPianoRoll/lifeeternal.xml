@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<song name="Life eternal" author="Mayhem">
+<?xml version="1.0" encoding="UTF-8"?>
+<song title="Life eternal" author="Mayhem" bpm="160">
     <audio>
         <lower hz="440"/>
         <higher hz="880"/>
         <distance steps="12"/>
-        <lowest offset="-12" note="A3"/>
+        <lowest offset="-12"/>
         <keys count="25"/>
     </audio>
-    <structure>
-        <length v="4/4"/>
-        <bpm v="190"/>
-        <measures count="2" repeat="2"/>
-        <bpm v="160"/>
-        <measure repeat="1"/>
-    </structure>
-    <instrument name="Euronymous">
-        <chord length="1">C4 C3</chord>
-        <note length="4">A</note>
-        <pause length="1"/>
-    </instrument>
+    <track name="Euronymous">
+        <note length="1">1 2</note>
+        <note length="4">3</note>
+        <note length="2"/>
+    </track>
+    <track name="Vikernes">
+        <note length="1">4 5</note>
+        <note length="4">6</note>
+        <note length="1"/>
+    </track>
 </song>
