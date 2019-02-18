@@ -6,11 +6,14 @@ import java.util.stream.Collectors;
 
 public class Track {
 
+	int bpm;
 	public final String name;
 	public final List<Note> notes;
+	public final int offset;
 	
-	public Track(String name) {
+	public Track(String name, int offset) {
 		this.name = name;
+		this.offset = offset;
 		this.notes = new ArrayList<>();
 	}
 

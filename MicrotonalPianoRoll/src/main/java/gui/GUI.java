@@ -19,8 +19,8 @@ public class GUI extends JFrame implements KeyListener {
 	private final Keyboard keyboard;
 
 	public GUI(Audio audio) {		
-		super("Microtonal Piano Roll :: " + audio.numEntries() + " keys :: " + format(audio.lowestFrequency()) + "Hz - " + format(audio.highestFrequency()) + "Hz");
-		keyboard = new Keyboard(audio.numEntries(), false);
+		super("Microtonal Piano Roll :: ");
+		keyboard = new Keyboard(25, false);
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(keyboard, BorderLayout.EAST);
 		setContentPane(panel);
@@ -31,9 +31,9 @@ public class GUI extends JFrame implements KeyListener {
 		setVisible(true);
 	}
 	
-	private static String format(double frequency) {
-		return String.format("%.1f", frequency);
-	}
+//	private static String format(double frequency) {
+//		return String.format("%.1f", frequency);
+//	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {

@@ -36,9 +36,7 @@ public class SongReader {
 			Audio audio = new Audio(
 				getReal("audio/lower/@hz", 1),
 				getReal("audio/higher/@hz", 1),
-				getInt("audio/distance/@steps", 1),
-				getInt("audio/lowest/@offset", Integer.MIN_VALUE),
-				getInt("audio/keys/@count", 1)
+				getInt("audio/distance/@steps", 1)
 			);
 			Song song = new Song(audio,
 				getInt("@bpm", 1),
@@ -47,10 +45,15 @@ public class SongReader {
 			);
 			// Song tracks
 			getList("track").forEach(t -> {
-				Track track = new Track(getString("@name", t, 0));
+				Track track = new Track(getString("@name", t, 0), getInt("@offset", t, Integer.MIN_VALUE));
+				track.bpm = song.bpm;
 				// Track notes
 				getList(t, "note").forEach(n -> {
-					Note note = new Note(getInt("@length", n, 1));
+					// Set new BPM
+					if(getInt("count(@bpm)", n, 0) == 1) {
+						track.bpm = getInt("@bpm", n, 1);
+					}
+					Note note = new Note(track.bpm, getString("@length", n, 1));
 					// Note values
 					getList(n, "tokenize(text(), '\\s')").forEach(v -> {
 						note.add(getInt("", v, 0));

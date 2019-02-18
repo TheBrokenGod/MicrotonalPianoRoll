@@ -1,20 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<song title="Life eternal" author="Mayhem" bpm="160">
+<song title="Life eternal" author="Mayhem" bpm="177">
+
     <audio>
-        <lower hz="440"/>
-        <higher hz="880"/>
+        <lower hz="27.5"/>
+        <higher hz="55"/>
         <distance steps="12"/>
-        <lowest offset="-12"/>
-        <keys count="25"/>
     </audio>
-    <track name="Euronymous">
-        <note length="1">1 2</note>
-        <note length="4">3</note>
-        <note length="2"/>
+    
+    <track name="Euronymous" offset="19" keys="30">
+        <note length="1">12</note>
+        
+        <note length="4">4</note>
+        <note length="4">7</note>
+        <note length="4">11</note>
+        <note length="4">4</note>
+        
+        <note length="2">12</note>
+        <note length="4">5</note>
+        <note length="4">12</note>
+        
+        <note length="2">13</note>
+        <note length="4">6</note>
+        <note length="4">13</note>
+        
+        <note length="2">12</note>
+        <note length="2">8</note>
+        
+        <note length="4">4</note>
+        <note length="4">7</note>
+        <note length="4">11</note>
+        <note length="4">4</note>
+        
+        <note length="2">12</note>
+        <note length="4">5</note>
+        <note length="4">12</note>
+        
+        <note length="2">13</note>
+        <note length="4">6</note>
+        <note length="4">13</note>
+        
+        
+        <note length="8T" bpm="118">5</note>
+        <note length="8T">12</note>
+        <note length="8T">19</note>
+        <note length="8T">5</note>
+        <note length="8T">12</note>
+        <note length="8T">19</note>
+        <note length="8T">5</note>
+        <note length="8T">12</note>
+        <note length="8T">19</note>
+        <note length="8T">5</note>
+        <note length="8T">12</note>
+        <note length="8T">19</note>
+        <note length="8T">5</note>
+        <note length="8T">12</note>
+        <note length="8T">20</note>
+        <note length="8T">5</note>
+        <note length="8T">12</note>
+        <note length="8T">19</note>
+        <note length="8T">6</note>
+        <note length="8T">13</note>
+        <note length="8T">6</note>
+        <note length="8T">13</note>
+        <note length="8T">6</note>
+        <note length="8T">13</note>
+        
+        <note length="8T">5</note>
+        <note length="8T">12</note>
+        <note length="8T">19</note>
+        <note length="8T">5</note>
+        <note length="8T">12</note>
+        <note length="8T">19</note>
+        <note length="8T">5</note>
+        <note length="8T">12</note>
+        <note length="8T">19</note>
+        <note length="8T">5</note>
+        <note length="8T">12</note>
+        <note length="8T">19</note>
+        <note length="8T">5</note>
+        <note length="8T">12</note>
+        <note length="8T">20</note>
+        <note length="8T">5</note>
+        <note length="8T">12</note>
+        <note length="8T">19</note>
+        <note length="8T">6</note>
+        <note length="8T">13</note>
+        <note length="8T">6</note>
+        <note length="8T">13</note>
+        <note length="8T">6</note>
+        <note length="8T">13</note>
     </track>
-    <track name="Vikernes">
+    
+    <track name="Vikernes" offset="7" keys="20">
         <note length="1">4 5</note>
         <note length="4">6</note>
-        <note length="1"/>
+        <!-- note length="2"/-->
     </track>
 </song>

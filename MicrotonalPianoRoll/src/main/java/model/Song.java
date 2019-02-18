@@ -6,12 +6,14 @@ import java.util.stream.Collectors;
 
 public class Song {
 
+	public final Audio audio;
 	public final int bpm;
 	public final String author;
 	public final String title;
 	public final List<Track> tracks;
 	
 	public Song(Audio audio, int bpm, String title, String author) {
+		this.audio = audio;
 		this.bpm = bpm;
 		this.title = title;
 		this.author = author;
