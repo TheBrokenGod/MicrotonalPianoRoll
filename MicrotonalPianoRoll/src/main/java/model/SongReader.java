@@ -1,6 +1,7 @@
 package model;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.xml.sax.SAXException;
 
@@ -39,22 +40,21 @@ public class SongReader {
 				getInt("audio/distance/@steps", 1)
 			);
 			Song song = new Song(audio,
-				getInt("@bpm", 1),
 				getString("@title", 0),
 				getString("@author", 0)
 			);
 			// Song tracks
 			getList("track").forEach(t -> {
-				Track track = new Track(getString("@name", t, 0), getInt("@offset", t, Integer.MIN_VALUE));
-				track.bpm = song.bpm;
+				Track track = new Track(getString("@name", t, 0), getInt("@offset", t));
+				AtomicInteger bpm = new AtomicInteger(getInt("@bpm", 1));
 				// Track notes
 				getList(t, "note").forEach(n -> {
-					// Set new BPM
-					if(getInt("count(@bpm)", n, 0) == 1) {
-						track.bpm = getInt("@bpm", n, 1);
+					// Change BPM
+					if(getInt("count(@bpm)", n) == 1) {
+						bpm.set(getInt("@bpm", n, 1));
 					}
-					Note note = new Note(track.bpm, getString("@length", n, 1));
-					// Note values
+					Note note = new Note(getString("@length", n, 1), bpm.get());
+					// Read values
 					getList(n, "tokenize(text(), '\\s')").forEach(v -> {
 						note.add(getInt("", v, 0));
 					});
@@ -102,6 +102,10 @@ public class SongReader {
 	
 	private int getInt(String expression, XdmItem context, int minValue) {
 		return (int) getReal(expression, context, minValue);
+	}
+	
+	private int getInt(String expression, XdmItem context) {
+		return (int) getReal(expression, context, Integer.MIN_VALUE);
 	}
 	
 	private int getInt(String expression, int minValue) {

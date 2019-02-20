@@ -7,42 +7,29 @@ import org.xml.sax.SAXException;
 import com.jsyn.JSyn;
 import com.jsyn.Synthesizer;
 import com.jsyn.unitgen.LineOut;
-import com.jsyn.unitgen.SawtoothOscillatorDPW;
-import com.jsyn.unitgen.UnitOscillator;
 
-import gui.GUI;
-import model.Audio;
 import model.Song;
 import model.SongReader;
-import model.Track;
 
 public class MainClass {
-	
-	static Synthesizer syn = JSyn.createSynthesizer();
-	static UnitOscillator gen = new SawtoothOscillatorDPW();
-	static LineOut out = new LineOut();
+
+	private static final Synthesizer SYNTH;
+	private static final LineOut OUT;
 	static {
-		syn.add(gen);
-		syn.add(out);
-		gen.output.connect(out.input);
-		syn.start();
-	}
-	
-	public static void playAudio(Audio audio, Track track) throws InterruptedException {
-		double start = syn.getCurrentTime();
-		for (int i = 0; i < track.notes.size(); i++)
-		{
-			gen.frequency.set(audio.get(track.offset, track.notes.get(i).values.get(0)));
-			out.start();
-			syn.sleepUntil(start += track.notes.get(i).duration());
-		}
-		syn.stop();
+		SYNTH = JSyn.createSynthesizer();
+		SYNTH.start();
+		SYNTH.add(OUT = new LineOut());
+		OUT.start();
 	}
 	
 	public static void main(String[] args) throws SAXException, InterruptedException {
 		Song song = new SongReader(new File("lifeeternal.xml")).read();
-		GUI gui = new GUI(new Audio(440, 880, 12));
-		playAudio(song.audio, song.tracks.get(0));
-		gui.dispose();
+//		GUI gui = new GUI(new Audio(440, 880, 12));
+		double time = SYNTH.getCurrentTime();
+		Thread g = Player.overdriveGuitar(SYNTH, time, song.audio, song.tracks.get(0), OUT.input);
+		Thread b = Player.fingeredBass(SYNTH, time, song.audio, song.tracks.get(1), OUT.input);
+		g.start();
+		b.start();
+//		gui.dispose();
 	}
 }

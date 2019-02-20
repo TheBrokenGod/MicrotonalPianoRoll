@@ -7,7 +7,8 @@
         <distance steps="12"/>
     </audio>
     
-    <track name="Euronymous" offset="19" keys="30">
+    <track name="Euronymous" offset="18" keys="30">
+ 
         <note length="1">12</note>
         
         <note length="4">4</note>
@@ -89,11 +90,39 @@
         <note length="8T">13</note>
         <note length="8T">6</note>
         <note length="8T">13</note>
+        
+        <note length="1" bpm="150">5 12 17</note>
+        <note length="1">13 20 25</note>
+        <note length="1">5 12 17</note>
+        <note length="1">4 11 16</note>
+        <note length="1">5 12 17</note>
+        <note length="1">13 20 25</note>
+        <note length="1">5 12 17</note>
+        <note length="1">4 11 16</note>
+        
+        <note length="1">5 12 17</note>
+        <note length="1">13 20 25</note>
+        <note length="1">5 12 17</note>
+        <note length="4">3 10 15</note>
+        <note length="8">3 10 15</note>
+        <note length="8">4 11 16</note>
+        <note length="2">4 11 16</note>
+        
+        <note length="1">5 12 17</note>
+        <note length="1">13 20 25</note>
+        <note length="1">5 12 17</note>
+        <note length="2">3 10 15</note>
+        <note length="2">4 11 16</note>
     </track>
     
-    <track name="Vikernes" offset="7" keys="20">
-        <note length="1">4 5</note>
-        <note length="4">6</note>
-        <!-- note length="2"/-->
+    <track name="Vikernes" offset="6" keys="20">
+        <note length="1">5</note>
+        <note length="1">4</note>
+        <note length="1">5</note>
+        <note length="1">6</note>
+        <note length="1">5</note>
+        <note length="1">4</note>
+        <note length="1">5</note>
+        <note length="1">6</note>
     </track>
 </song>

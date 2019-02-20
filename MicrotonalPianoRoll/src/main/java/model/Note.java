@@ -6,17 +6,17 @@ import java.util.stream.Collectors;
 
 public class Note {
 
+	public final int len;
 	public final int bpm;
-	public final int invLen;
 	public final List<Integer> values;
 	
-	public Note(int bpm, String noteLen) {
+	public Note(String len, int bpm) {
 		this.bpm = bpm;
-		if(!noteLen.endsWith("T")) {
-			invLen = Integer.parseInt(noteLen); 
+		if(!len.endsWith("T")) {
+			this.len = Integer.parseInt(len); 
 		}
 		else {
-			invLen = 3 * Integer.parseInt(noteLen.substring(0, noteLen.length() - 1)) / 2;
+			this.len = 3 * Integer.parseInt(len.substring(0, len.length() - 1)) / 2;
 		}
 		values = new ArrayList<>();
 	}
@@ -26,12 +26,12 @@ public class Note {
 	}
 	
 	public double duration() {
-		return 240.0 / bpm / invLen;
+		return 240.0 / bpm / len;
 	}
 	
 	@Override
 	public String toString() {
-		return "\t" + invLen + ": " + 
+		return "\t" + len + ": " + 
 				(values.isEmpty() ? "-" : "[" + values.stream().map(value -> value.toString()).collect(Collectors.joining(" ")) + "]");
 	}
 }
