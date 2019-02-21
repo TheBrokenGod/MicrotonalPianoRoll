@@ -2,23 +2,20 @@ package model;
 
 public class Audio {
 
-	private final double lowerFrequency;
 	private final double coefficient;
-	
-	/**
-	 * 
-	 * @param lowerFrequency
-	 * @param higherFrequency
-	 * @param stepsInBetween
-	 */
-	public Audio(double lowerFrequency, double higherFrequency, int stepsInBetween) {
-		this.lowerFrequency = lowerFrequency;
+	private final double lowestFreq;
+	public final int numKeys;
+		
+	public Audio(double lowerFrequency, double higherFrequency, int stepsInBetween, int lowestOffsetFromLower, int keysCount) {
+		numKeys = keysCount;
 		// Compute the coefficient needed to move in the frequencies table
 		coefficient = Math.pow(higherFrequency / lowerFrequency, 1.0 / stepsInBetween);
+		// Start at the specified position from lower frequency
+		lowestFreq = lowerFrequency * Math.pow(coefficient, lowestOffsetFromLower);
 	}
 	
-	public double get(int baseOffsetFromLower, int noteIndex) {
-		return lowerFrequency * Math.pow(coefficient, baseOffsetFromLower + noteIndex);
+	public double calcFrequencyAt(int noteIndex) {
+		return lowestFreq * Math.pow(coefficient, noteIndex);
 	}
 	
 //	@Override

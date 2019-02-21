@@ -58,7 +58,7 @@ public class Player extends Thread {
 				for (int i = 0; i < units.length; i++) {
 					if(i < note.values.size()) {
 						units[i].setEnabled(true);
-						units[i].frequency.set(audio.get(track.offset, note.values.get(i)));
+						units[i].frequency.set(audio.calcFrequencyAt(note.values.get(i)));
 					}
 					else {
 						units[i].setEnabled(false);					

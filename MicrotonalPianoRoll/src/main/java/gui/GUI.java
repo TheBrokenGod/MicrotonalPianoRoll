@@ -20,7 +20,7 @@ public class GUI extends JFrame implements KeyListener {
 
 	public GUI(Audio audio) {		
 		super("Microtonal Piano Roll :: ");
-		keyboard = new Keyboard(25, false);
+		keyboard = new Keyboard(audio, false);
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(keyboard, BorderLayout.EAST);
 		setContentPane(panel);

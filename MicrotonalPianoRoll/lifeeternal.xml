@@ -1,128 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<song title="Life eternal" author="Mayhem" bpm="177">
+<track bpm="177" name="Life Eternal - Mayhem">
 
-    <audio>
-        <lower hz="27.5"/>
-        <higher hz="55"/>
-        <distance steps="12"/>
-    </audio>
+	<audio>
+	    <lower hz="27.5"/>
+	    <higher hz="55"/>
+	    <distance steps="12"/>
+	    <offset steps="18"/>
+	    <keys count="30"/>
+	</audio>
+	
+    <note length="1">12</note>
     
-    <track name="Euronymous" offset="18" keys="30">
- 
-        <note length="1">12</note>
-        
-        <note length="4">4</note>
-        <note length="4">7</note>
-        <note length="4">11</note>
-        <note length="4">4</note>
-        
-        <note length="2">12</note>
-        <note length="4">5</note>
-        <note length="4">12</note>
-        
-        <note length="2">13</note>
-        <note length="4">6</note>
-        <note length="4">13</note>
-        
-        <note length="2">12</note>
-        <note length="2">8</note>
-        
-        <note length="4">4</note>
-        <note length="4">7</note>
-        <note length="4">11</note>
-        <note length="4">4</note>
-        
-        <note length="2">12</note>
-        <note length="4">5</note>
-        <note length="4">12</note>
-        
-        <note length="2">13</note>
-        <note length="4">6</note>
-        <note length="4">13</note>
-        
-        
-        <note length="8T" bpm="118">5</note>
-        <note length="8T">12</note>
-        <note length="8T">19</note>
-        <note length="8T">5</note>
-        <note length="8T">12</note>
-        <note length="8T">19</note>
-        <note length="8T">5</note>
-        <note length="8T">12</note>
-        <note length="8T">19</note>
-        <note length="8T">5</note>
-        <note length="8T">12</note>
-        <note length="8T">19</note>
-        <note length="8T">5</note>
-        <note length="8T">12</note>
-        <note length="8T">20</note>
-        <note length="8T">5</note>
-        <note length="8T">12</note>
-        <note length="8T">19</note>
-        <note length="8T">6</note>
-        <note length="8T">13</note>
-        <note length="8T">6</note>
-        <note length="8T">13</note>
-        <note length="8T">6</note>
-        <note length="8T">13</note>
-        
-        <note length="8T">5</note>
-        <note length="8T">12</note>
-        <note length="8T">19</note>
-        <note length="8T">5</note>
-        <note length="8T">12</note>
-        <note length="8T">19</note>
-        <note length="8T">5</note>
-        <note length="8T">12</note>
-        <note length="8T">19</note>
-        <note length="8T">5</note>
-        <note length="8T">12</note>
-        <note length="8T">19</note>
-        <note length="8T">5</note>
-        <note length="8T">12</note>
-        <note length="8T">20</note>
-        <note length="8T">5</note>
-        <note length="8T">12</note>
-        <note length="8T">19</note>
-        <note length="8T">6</note>
-        <note length="8T">13</note>
-        <note length="8T">6</note>
-        <note length="8T">13</note>
-        <note length="8T">6</note>
-        <note length="8T">13</note>
-        
-        <note length="1" bpm="150">5 12 17</note>
-        <note length="1">13 20 25</note>
-        <note length="1">5 12 17</note>
-        <note length="1">4 11 16</note>
-        <note length="1">5 12 17</note>
-        <note length="1">13 20 25</note>
-        <note length="1">5 12 17</note>
-        <note length="1">4 11 16</note>
-        
-        <note length="1">5 12 17</note>
-        <note length="1">13 20 25</note>
-        <note length="1">5 12 17</note>
-        <note length="4">3 10 15</note>
-        <note length="8">3 10 15</note>
-        <note length="8">4 11 16</note>
-        <note length="2">4 11 16</note>
-        
-        <note length="1">5 12 17</note>
-        <note length="1">13 20 25</note>
-        <note length="1">5 12 17</note>
-        <note length="2">3 10 15</note>
-        <note length="2">4 11 16</note>
-    </track>
+    <note length="4">4</note>
+    <note length="4">7</note>
+    <note length="4">11</note>
+    <note length="4">4</note>
     
-    <track name="Vikernes" offset="6" keys="20">
-        <note length="1">5</note>
-        <note length="1">4</note>
-        <note length="1">5</note>
-        <note length="1">6</note>
-        <note length="1">5</note>
-        <note length="1">4</note>
-        <note length="1">5</note>
-        <note length="1">6</note>
-    </track>
-</song>
+    <note length="2">12</note>
+    <note length="4">5</note>
+    <note length="4">12</note>
+    
+    <note length="2">13</note>
+    <note length="4">6</note>
+    <note length="4">13</note>
+    
+    <note length="2">12</note>
+    <note length="2">8</note>
+    
+    <note length="4">4</note>
+    <note length="4">7</note>
+    <note length="4">11</note>
+    <note length="4">4</note>
+    
+    <note length="2">12</note>
+    <note length="4">5</note>
+    <note length="4">12</note>
+    
+    <note length="2">13</note>
+    <note length="4">6</note>
+    <note length="4">13</note>
+    
+    
+    <note length="8T" bpm="118">5</note>
+    <note length="8T">12</note>
+    <note length="8T">19</note>
+    <note length="8T">5</note>
+    <note length="8T">12</note>
+    <note length="8T">19</note>
+    <note length="8T">5</note>
+    <note length="8T">12</note>
+    <note length="8T">19</note>
+    <note length="8T">5</note>
+    <note length="8T">12</note>
+    <note length="8T">19</note>
+    <note length="8T">5</note>
+    <note length="8T">12</note>
+    <note length="8T">20</note>
+    <note length="8T">5</note>
+    <note length="8T">12</note>
+    <note length="8T">19</note>
+    <note length="8T">6</note>
+    <note length="8T">13</note>
+    <note length="8T">6</note>
+    <note length="8T">13</note>
+    <note length="8T">6</note>
+    <note length="8T">13</note>
+    
+    <note length="8T">5</note>
+    <note length="8T">12</note>
+    <note length="8T">19</note>
+    <note length="8T">5</note>
+    <note length="8T">12</note>
+    <note length="8T">19</note>
+    <note length="8T">5</note>
+    <note length="8T">12</note>
+    <note length="8T">19</note>
+    <note length="8T">5</note>
+    <note length="8T">12</note>
+    <note length="8T">19</note>
+    <note length="8T">5</note>
+    <note length="8T">12</note>
+    <note length="8T">20</note>
+    <note length="8T">5</note>
+    <note length="8T">12</note>
+    <note length="8T">19</note>
+    <note length="8T">6</note>
+    <note length="8T">13</note>
+    <note length="8T">6</note>
+    <note length="8T">13</note>
+    <note length="8T">6</note>
+    <note length="8T">13</note>
+    
+    <note length="1" bpm="150">5 12 17</note>
+    <note length="1">13 20 25</note>
+    <note length="1">5 12 17</note>
+    <note length="1">4 11 16</note>
+    <note length="1">5 12 17</note>
+    <note length="1">13 20 25</note>
+    <note length="1">5 12 17</note>
+    <note length="1">4 11 16</note>
+    
+    <note length="1">5 12 17</note>
+    <note length="1">13 20 25</note>
+    <note length="1">5 12 17</note>
+    <note length="4">3 10 15</note>
+    <note length="8">3 10 15</note>
+    <note length="8">4 11 16</note>
+    <note length="2">4 11 16</note>
+    
+    <note length="1">5 12 17</note>
+    <note length="1">13 20 25</note>
+    <note length="1">5 12 17</note>
+    <note length="2">3 10 15</note>
+    <note length="2">4 11 16</note>
+</track>

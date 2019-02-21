@@ -6,13 +6,13 @@ import java.util.stream.Collectors;
 
 public class Track {
 
-	public final int offset;
+	public final Audio audio;
 	public final String name;
 	public final List<Note> notes;
 	
-	public Track(String name, int offset) {
+	public Track(Audio audio, String name) {
+		this.audio = audio;
 		this.name = name;
-		this.offset = offset;
 		this.notes = new ArrayList<>();
 	}
 

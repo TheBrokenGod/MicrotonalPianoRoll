@@ -31,7 +31,7 @@ public class Note {
 	
 	@Override
 	public String toString() {
-		return "\t" + len + ": " + 
+		return len + ": " + 
 				(values.isEmpty() ? "-" : "[" + values.stream().map(value -> value.toString()).collect(Collectors.joining(" ")) + "]");
 	}
 }

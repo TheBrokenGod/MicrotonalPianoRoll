@@ -24,45 +24,39 @@ public class SongReader {
 		xpath = proc.newXPathCompiler();
 		try {
 			document = proc.newDocumentBuilder().build(file);
-			document = xpath.evaluate("song", document).itemAt(0);
+			document = xpath.evaluate("track", document).itemAt(0);
 		}
 		catch(SaxonApiException | IndexOutOfBoundsException e) {
 			throw new SAXException(e);
 		}
 	}
 	
-	public Song read() throws SAXException {
+	public Track read() throws SAXException {
 		try {
 			// Audio synthesis
 			Audio audio = new Audio(
 				getReal("audio/lower/@hz", 1),
 				getReal("audio/higher/@hz", 1),
-				getInt("audio/distance/@steps", 1)
+				getInt("audio/distance/@steps", 1),
+				getInt("audio/offset/@steps", Integer.MIN_VALUE),
+				getInt("audio/keys/@count", 1)
 			);
-			Song song = new Song(audio,
-				getString("@title", 0),
-				getString("@author", 0)
-			);
-			// Song tracks
-			getList("track").forEach(t -> {
-				Track track = new Track(getString("@name", t, 0), getInt("@offset", t));
-				AtomicInteger bpm = new AtomicInteger(getInt("@bpm", 1));
-				// Track notes
-				getList(t, "note").forEach(n -> {
-					// Change BPM
-					if(getInt("count(@bpm)", n) == 1) {
-						bpm.set(getInt("@bpm", n, 1));
-					}
-					Note note = new Note(getString("@length", n, 1), bpm.get());
-					// Read values
-					getList(n, "tokenize(text(), '\\s')").forEach(v -> {
-						note.add(getInt("", v, 0));
-					});
-					track.add(note);
+			Track track = new Track(audio, getString("@name", 0));
+			AtomicInteger bpm = new AtomicInteger(getInt("@bpm", 1));
+			// Read notes
+			getList("note").forEach(n -> {
+				// Change BPM
+				if(getInt("count(@bpm)", n) == 1) {
+					bpm.set(getInt("@bpm", n, 1));
+				}
+				Note note = new Note(getString("@length", n, 1), bpm.get());
+				// Read values
+				getList(n, "tokenize(text(), '\\s')").forEach(v -> {
+					note.add(getInt("", v, 0));
 				});
-				song.add(track);
+				track.add(note);
 			});
-			return song;
+			return track;
 		}
 		catch(SaxonApiUncheckedException e) {
 			throw new SAXException(e);

@@ -27,11 +27,11 @@ class Key extends JToggleButton implements MouseListener {
 
 	private final Keyboard keyboard;
 	private KeyState status;
-	final double value;
+	final int index;
 	
-	Key(Keyboard keyboard, double value) {
+	Key(Keyboard keyboard, int index) {
 		this.keyboard = keyboard;
-		this.value = value;
+		this.index = index;
 		setState(KeyState.Inactive);
 		setPreferredSize(keyboard.isVertical() ? KEY_SIZE_VERTICAL : KEY_SIZE_HORIZONTAL);
 		setBorder(KEYS_BORDER);
