@@ -14,8 +14,5 @@ public class MainClass {
 		Track track = new SongReader(new File("lifeeternal.xml")).read();
 		GUI gui = new GUI(track);
 		gui.play();
-		Thread.sleep(1000);
-		gui.stop();
-		gui.play();
 	}
 }
