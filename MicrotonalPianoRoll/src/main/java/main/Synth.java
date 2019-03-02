@@ -8,14 +8,14 @@ import com.jsyn.unitgen.UnitOscillator;
 
 import model.Audio;
 
-public class KeySynth {
+public class Synth {
 
 	public final Synthesizer synth;
 	private final UnitOscillator[] keys;
 	private final MixerMono mixer;
 	private final LineOut out;
 	
-	public KeySynth(Audio audio, Class<? extends UnitOscillator> unitOsc) {
+	public Synth(Audio audio, Class<? extends UnitOscillator> unitOsc) {
 		(synth = JSyn.createSynthesizer()).start();
 		keys = new UnitOscillator[audio.numKeys];
 		synth.add(mixer = new MixerMono(audio.numKeys));
@@ -46,5 +46,10 @@ public class KeySynth {
 	
 	public void sleepUntil(double time) throws InterruptedException {
 		synth.sleepUntil(time);
+	}
+	
+	public void dispose() {
+		out.stop();
+		synth.stop();
 	}
 }

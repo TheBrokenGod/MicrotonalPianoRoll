@@ -9,8 +9,10 @@ public class Key extends JToggleButton {
 
 	private static final long serialVersionUID = 1L;
 	
+	final int index;
+	
 	Key(int index) {
-		setPreferredSize(Const.KEY_SIZE);
+		this.index = index;
 		setBorder(Const.KEY_BORDER);
 		setFocusable(false);
 	}
@@ -18,13 +20,12 @@ public class Key extends JToggleButton {
 	@Override
 	public void paintComponent(Graphics g) {
 		if(isSelected()) {
-			g.setColor(Const.KEY_PLAYING_COLOR);
+			g.setColor(Const.KEY_HELD_COLOR);
 		}
 		else {
-			g.setColor(Const.KEY_MUTE_COLOR);			
+			g.setColor(Const.KEY_COLOR);			
 		}
-		Insets border = getInsets();
-		g.fillRect(border.left, border.top, getWidth() - border.left - border.right, getHeight() - border.top - border.bottom);
-		g.drawImage(Const.ICON, (int) (getWidth() * Const.KEY_ICON_PLACEMENT), (getHeight() - Const.KEY_ICON_SIZE) / 2, null);
+		Insets insets = getInsets();
+		g.fillRect(insets.left, insets.top, getWidth() - insets.left - insets.right, getHeight() - insets.top - insets.bottom);
 	}
 }
