@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class Note {
 
-	public final int len;
+	private final int len;
 	public final int bpm;
 	public final List<Integer> values;
 	
@@ -25,7 +25,11 @@ public class Note {
 		values.add(value);
 	}
 	
-	public double duration() {
+	public double logicalLength() {
+		return 1.0 / len;
+	}
+	
+	public double soundDuration() {
 		return 240.0 / bpm / len;
 	}
 	

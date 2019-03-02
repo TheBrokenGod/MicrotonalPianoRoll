@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<track bpm="177" name="Life Eternal - Mayhem">
+<track lower="27.5" higher="55" steps="12" start="18" keys="30" bpm="177">
 
-	<audio>
-	    <lower hz="27.5"/>
-	    <higher hz="55"/>
-	    <distance steps="12"/>
-	    <offset steps="18"/>
-	    <keys count="30"/>
-	</audio>
-	
     <note length="1">12</note>
     
     <note length="4">4</note>
@@ -39,7 +31,6 @@
     <note length="2">13</note>
     <note length="4">6</note>
     <note length="4">13</note>
-    
     
     <note length="8T" bpm="118">5</note>
     <note length="8T">12</note>

@@ -34,14 +34,13 @@ public class SongReader {
 	public Track read() throws SAXException {
 		try {
 			// Audio synthesis
-			Audio audio = new Audio(
-				getReal("audio/lower/@hz", 1),
-				getReal("audio/higher/@hz", 1),
-				getInt("audio/distance/@steps", 1),
-				getInt("audio/offset/@steps", Integer.MIN_VALUE),
-				getInt("audio/keys/@count", 1)
+			Track track = new Track(
+				getReal("@lower", 1),
+				getReal("@higher", 1),
+				getInt("@steps", 1),
+				getInt("@start", Integer.MIN_VALUE),
+				getInt("@keys", 1)
 			);
-			Track track = new Track(audio, getString("@name", 0));
 			AtomicInteger bpm = new AtomicInteger(getInt("@bpm", 1));
 			// Read notes
 			getList("note").forEach(n -> {
@@ -90,9 +89,9 @@ public class SongReader {
 		}
 	}
 	
-	private String getString(String expression, int minLength) {
-		return getString(expression, document, minLength);
-	}
+//	private String getString(String expression, int minLength) {
+//		return getString(expression, document, minLength);
+//	}
 	
 	private int getInt(String expression, XdmItem context, int minValue) {
 		return (int) getReal(expression, context, minValue);

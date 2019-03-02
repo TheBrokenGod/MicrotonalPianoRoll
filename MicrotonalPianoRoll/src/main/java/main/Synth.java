@@ -6,7 +6,7 @@ import com.jsyn.unitgen.LineOut;
 import com.jsyn.unitgen.MixerMono;
 import com.jsyn.unitgen.UnitOscillator;
 
-import model.Audio;
+import model.Track;
 
 public class Synth {
 
@@ -15,10 +15,10 @@ public class Synth {
 	private final MixerMono mixer;
 	private final LineOut out;
 	
-	public Synth(Audio audio, Class<? extends UnitOscillator> unitOsc) {
+	public Synth(Track track, Class<? extends UnitOscillator> unitOsc) {
 		(synth = JSyn.createSynthesizer()).start();
-		keys = new UnitOscillator[audio.numKeys];
-		synth.add(mixer = new MixerMono(audio.numKeys));
+		keys = new UnitOscillator[track.numKeys];
+		synth.add(mixer = new MixerMono(track.numKeys));
 		for (int i = 0; i < keys.length; i++) {
 			try {
 				synth.add(keys[i] = unitOsc.getDeclaredConstructor().newInstance());
@@ -26,7 +26,7 @@ public class Synth {
 			catch (ReflectiveOperationException e) {
 				throw new RuntimeException(e);
 			}
-			keys[i].frequency.set(audio.calcFrequencyAt(i));
+			keys[i].frequency.set(track.calcFrequencyAt(i));
 			keys[i].amplitude.set(0);
 			keys[i].output.connect(0, mixer.input, i);
 		}

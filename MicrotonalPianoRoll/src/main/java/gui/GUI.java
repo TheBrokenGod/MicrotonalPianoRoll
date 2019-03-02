@@ -22,6 +22,7 @@ import javax.swing.SwingUtilities;
 import com.jsyn.unitgen.SawtoothOscillator;
 
 import main.Synth;
+import model.Measure;
 import model.Note;
 import model.Track;
 
@@ -50,13 +51,13 @@ public class GUI extends JFrame implements KeyListener {
 
 	public void setTrack(Track track) {
 		this.track = track;
-		setTitle("Microtonal Piano Roll :: " + track.audio.toString());
+		setTitle("Microtonal Piano Roll :: " + track.toString());
 		if(synth != null) {
 			synth.dispose();
 		}
-		synth = new Synth(track.audio, SawtoothOscillator.class);
-		keyboard = new Keyboard(track.audio.numKeys);
-		roll = new Roll(track.audio.numKeys, 12);
+		synth = new Synth(track, SawtoothOscillator.class);
+		keyboard = new Keyboard(track.numKeys);
+		roll = new Roll(track.numKeys, 12);
 		JPanel root = new JPanel();
 		root.setLayout(new BoxLayout(root, BoxLayout.LINE_AXIS));
 		root.add(keyboard);
@@ -178,10 +179,12 @@ public class GUI extends JFrame implements KeyListener {
 		Optional<Note> prev = Optional.empty();
 		try {
 			double time = synth.getCurrentTime();
-			for(Note note : track.notes) {
-				setKeyState(prev, false);
-				setKeyState(prev = Optional.of(note), true);
-				synth.sleepUntil(time += note.duration());
+			for(Measure measure : track.measures) {
+				for(Note note : measure.notes) {
+					setKeyState(prev, false);
+					setKeyState(prev = Optional.of(note), true);
+					synth.sleepUntil(time += note.soundDuration());
+				}
 			}
 		}
 		catch (InterruptedException e) {
