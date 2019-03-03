@@ -18,7 +18,7 @@ public class Const {
 	static final Color KEY_COLOR = Color.WHITE;
 	static final Color KEY_HELD_COLOR = KEY_COLOR.darker();
 	
-	static final Dimension HOLE_SIZE_4 = new Dimension(2 * KEY_SIZE.width, KEY_SIZE.height);
+	static final Dimension ROLL_SIZE = new Dimension(4 * KEY_SIZE.width, KEY_SIZE.height);
 	static final Border HOLE_BORDER = BorderFactory.createLineBorder(Color.GRAY, BORDER_THICKNESS);
 	static final Color HOLE_COLOR_EVEN = new Color(0xEE, 0xEE, 0xEE);
 	static final Color HOLE_COLOR_ODD = Color.WHITE;

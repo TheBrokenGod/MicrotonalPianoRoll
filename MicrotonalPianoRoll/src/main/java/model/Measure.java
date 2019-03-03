@@ -17,11 +17,12 @@ public class Measure {
 		return freeSpace() == 0;
 	}
 	
-	public void add(Note note) throws SaxonApiException {
+	public Measure add(Note note) throws SaxonApiException {
 		if(freeSpace() < note.logicalLength()) {
 			throw new SaxonApiException(note + " does not fit its misure");
 		}
 		notes.add(note);
+		return this;
 	}
 	
 	public double freeSpace() {

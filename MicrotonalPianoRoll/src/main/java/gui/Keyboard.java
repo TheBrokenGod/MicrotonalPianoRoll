@@ -27,7 +27,13 @@ public class Keyboard extends JPanel {
 		setPreferredSize(new Dimension(Const.KEY_SIZE.width, (numKeys + 1) * Const.KEY_SIZE.height));
 	}
 	
-	Key get(int key) {
-		return (Key) getComponent(getComponentCount() - key - 1);
+	void deselectAll() {
+		for (int i = 0; i < keys.length; i++) {
+			keys[i].setSelected(false);
+		}
+	}
+	
+	void select(int key) {
+		keys[key].setSelected(true);
 	}
 }

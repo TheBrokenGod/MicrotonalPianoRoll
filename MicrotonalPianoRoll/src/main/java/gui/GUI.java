@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Optional;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -34,7 +33,8 @@ public class GUI extends JFrame implements KeyListener {
 	private Synth synth;
 	private Keyboard keyboard;
 	private Roll roll;
-	private Thread player;
+	private Thread[] player;
+	private Double playerStart;
 
 	public GUI(Track track) {
 		buildMenu();
@@ -43,6 +43,7 @@ public class GUI extends JFrame implements KeyListener {
 		setContentPane(root);		
 		setTrack(track);
 		player = null;
+		playerStart = null;
 		addKeyListener(this);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -57,7 +58,7 @@ public class GUI extends JFrame implements KeyListener {
 		}
 		synth = new Synth(track, SawtoothOscillator.class);
 		keyboard = new Keyboard(track.numKeys);
-		roll = new Roll(track.numKeys, 12);
+		roll = new Roll(track.numKeys);
 		JPanel root = new JPanel();
 		root.setLayout(new BoxLayout(root, BoxLayout.LINE_AXIS));
 		root.add(keyboard);
@@ -164,25 +165,30 @@ public class GUI extends JFrame implements KeyListener {
 	}
 
 	public void play() {
-		player = new Thread(this::doPlay);
-		player.setPriority(Thread.MAX_PRIORITY);
-		player.start();
+		player = new Thread[] {new Thread(this::audioPlay), new Thread(this::visualPlay)};
+		player[0].setPriority(Thread.MAX_PRIORITY);
+		player[1].setPriority(Thread.MAX_PRIORITY);
+		playerStart = synth.getCurrentTime();
+		player[0].start();
+		player[1].start();
 	}
 	
 	public void stop() throws InterruptedException {
-		player.interrupt();
-		player.join();
+		player[0].interrupt();
+		player[1].interrupt();
+		player[0].join();
+		player[1].join();
+		playerStart = null;
 		player = null;
 	}
 	
-	private void doPlay() {
-		Optional<Note> prev = Optional.empty();
+	private void audioPlay() {
+		double time = playerStart;
 		try {
-			double time = synth.getCurrentTime();
 			for(Measure measure : track.measures) {
 				for(Note note : measure.notes) {
-					setKeyState(prev, false);
-					setKeyState(prev = Optional.of(note), true);
+					synth.releaseAll();
+					note.values.forEach(key -> synth.hold(key));
 					synth.sleepUntil(time += note.soundDuration());
 				}
 			}
@@ -190,29 +196,33 @@ public class GUI extends JFrame implements KeyListener {
 		catch (InterruptedException e) {
 		}
 		finally {
-			try {
-				setKeyState(prev, false);
-			}
-			catch (InterruptedException e) {
-			}			
+			synth.releaseAll();
 		}
 	}
 	
-	private void setKeyState(Optional<Note> note, boolean held) throws InterruptedException {
-		if(!note.isPresent()) {
-			return;
-		}
-		for(int key : note.get().values) {
-			synth.setKeyState(key, held);	
-			try {
+	private void visualPlay() {
+		double time = playerStart;
+		try {
+			for(Measure measure : track.measures) {
 				SwingUtilities.invokeAndWait(() -> {
-					keyboard.get(key).setSelected(held);
+					roll.setActiveMeasure(measure);
 				});
+				for(Note note : measure.notes) {
+					SwingUtilities.invokeAndWait(() -> {
+						keyboard.deselectAll();
+						note.values.forEach(key -> keyboard.select(key));
+					});
+					synth.sleepUntil(time += note.soundDuration());
+				}
 			}
-			catch(InvocationTargetException e) {
-				throw new RuntimeException(e);
-			}
+		}
+		catch (InterruptedException | InvocationTargetException e) {
+		}
+		finally {
+			SwingUtilities.invokeLater(() -> {
+				roll.setActiveMeasure(track.measures.get(0));
+				keyboard.deselectAll();
+			});
 		}
 	}
-
 }
