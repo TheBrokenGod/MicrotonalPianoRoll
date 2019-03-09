@@ -1,11 +1,8 @@
 package gui;
 
 import java.awt.Dimension;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -17,25 +14,21 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 
 import com.jsyn.unitgen.SawtoothOscillator;
 
 import main.Synth;
-import model.Measure;
-import model.Note;
 import model.Track;
 
 public class GUI extends JFrame implements KeyListener {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Track track;
-	private Synth synth;
-	private Piano piano;
-	private Roll roll;
-	private Thread[] player;
-	private Double playerStart;
+	Track track;
+	Synth synth;
+	Piano piano;
+	Roll roll;
+	private Player player;
 
 	public GUI(Track track) {
 		buildMenu();
@@ -43,8 +36,7 @@ public class GUI extends JFrame implements KeyListener {
 		root.setLayout(new BoxLayout(root, BoxLayout.LINE_AXIS));
 		setContentPane(root);		
 		setTrack(track);
-		player = null;
-		playerStart = null;
+		player = new Player(this);
 		addKeyListener(this);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -71,27 +63,27 @@ public class GUI extends JFrame implements KeyListener {
 		setJMenuBar(bar);
 		JMenu menu, sub;
 		bar.add(menu = new JMenu("Track"));
-		menu.add(buildItem("New", null, KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
-		menu.add(buildItem("Open", null, KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
-		menu.add(buildItem("Save", null, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
-		menu.add(buildItem("Save as", null, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
+		menu.add(buildMenuItem("New", null, KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("Open", null, KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("Save", null, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("Save as", null, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
 		menu.addSeparator();
-		menu.add(buildItem("Set audio", null, KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
-		menu.add(buildItem("Play", null, KeyEvent.VK_SPACE, 0));
+		menu.add(buildMenuItem("Set audio", null, KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("Play", this::startOrStop, KeyEvent.VK_SPACE, 0));
 		menu.addSeparator();
-		menu.add(buildItem("Exit", null, null, null));		
+		menu.add(buildMenuItem("Exit", null, null, null));		
 		bar.add(menu = new JMenu("Navigation"));
 		menu.add(sub = new JMenu("Measure"));
-		sub.add(buildItem("Previous", null, KeyEvent.VK_LEFT, 0));
-		sub.add(buildItem("Next", null, KeyEvent.VK_RIGHT, 0));
+		sub.add(buildMenuItem("Previous", null, KeyEvent.VK_LEFT, 0));
+		sub.add(buildMenuItem("Next", null, KeyEvent.VK_RIGHT, 0));
 		sub.addSeparator();
-		sub.add(buildItem("First", null, KeyEvent.VK_HOME, 0));
-		sub.add(buildItem("Last", null, KeyEvent.VK_END, 0));
+		sub.add(buildMenuItem("First", null, KeyEvent.VK_HOME, 0));
+		sub.add(buildMenuItem("Last", null, KeyEvent.VK_END, 0));
 		sub.addSeparator();
-		sub.add(buildItem("By index", null, KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("By index", null, KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(sub = new JMenu("Tempo change"));
-		sub.add(buildItem("Previous", null, KeyEvent.VK_PAGE_UP, 0));
-		sub.add(buildItem("Next", null, KeyEvent.VK_PAGE_DOWN, 0));
+		sub.add(buildMenuItem("Previous", null, KeyEvent.VK_PAGE_UP, 0));
+		sub.add(buildMenuItem("Next", null, KeyEvent.VK_PAGE_DOWN, 0));
 		bar.add(menu = new JMenu("Composition"));
 		menu.add(sub = new JMenu("Resolution"));
 		ButtonGroup res = new ButtonGroup();
@@ -108,22 +100,22 @@ public class GUI extends JFrame implements KeyListener {
 		sub.add(buildRadioItem("16T", res));
 		sub.add(buildRadioItem("32T", res));
 		sub.addSeparator();
-		sub.add(buildItem("Increase", null, KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK));
-		sub.add(buildItem("Decrease", null, KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("Increase", null, KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("Decrease", null, KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(sub = new JMenu("Measure"));
-		sub.add(buildItem("Insert", null, null, null));
-		sub.add(buildItem("Delete", null, null, null));
+		sub.add(buildMenuItem("Insert", null, null, null));
+		sub.add(buildMenuItem("Delete", null, null, null));
 		menu.add(sub = new JMenu("Tempo change"));
-		sub.add(buildItem("Set", null, null, null));
-		sub.add(buildItem("Clear", null, null, null));
+		sub.add(buildMenuItem("Set", null, null, null));
+		sub.add(buildMenuItem("Clear", null, null, null));
 		bar.add(menu = new JMenu("About"));
-		menu.add(buildItem("Info", null, null, null));
+		menu.add(buildMenuItem("Info", null, null, null));
 	}
 	
-	private static JMenuItem buildItem(String text, ActionListener listener, Integer keyCode, Integer modifiers) {
+	private static JMenuItem buildMenuItem(String text, Runnable action, Integer keyCode, Integer modifiers) {
 		JMenuItem item = new JMenuItem(text);
-		if(listener != null) {
-			item.addActionListener(listener);
+		if(action != null) {
+			item.addActionListener(e -> action.run());
 		}
 		if(keyCode != null) {
 			item.setAccelerator(KeyStroke.getKeyStroke(keyCode, modifiers != null ? modifiers : 0));
@@ -160,81 +152,13 @@ public class GUI extends JFrame implements KeyListener {
 	@Override
 	public void keyTyped(KeyEvent e) {
 	}
-
-	public void play() {
-		player = new Thread[] {new Thread(this::audioPlay), new Thread(this::visualPlay)};
-		player[0].setPriority(Thread.MAX_PRIORITY);
-		player[1].setPriority(Thread.MAX_PRIORITY);
-		playerStart = synth.getCurrentTime();
-		player[0].start();
-		player[1].start();
-	}
 	
-	public void stop() throws InterruptedException {
-		player[0].interrupt();
-		player[1].interrupt();
-		player[0].join();
-		player[1].join();
-		playerStart = null;
-		player = null;
-	}
-	
-	private void audioPlay() {
-		double time = playerStart;
-		try {
-			for(Measure measure : track.measures) {
-				for(Note note : measure.notes) {
-					synth.releaseAll();
-					note.values.forEach(key -> synth.hold(key));
-					synth.sleepUntil(time += note.soundDuration());
-				}
-			}
+	private void startOrStop() {
+		if(player.isPlaying()) {
+			player.stop();
 		}
-		catch (InterruptedException e) {
-		}
-		finally {
-			synth.releaseAll();
-		}
-	}
-	
-	private void visualPlay() {
-		double time = playerStart;
-		try {
-			// Rebuild roll for current measure
-			for(Measure measure : track.measures) {
-				SwingUtilities.invokeAndWait(() -> {
-					roll.setMeasure(measure);
-				});
-				List<Note> notes = measure.notes;
-				for(int i = 0; i < notes.size(); i++) {
-					Note note = notes.get(i);
-					// Hold piano keys of current note
-					SwingUtilities.invokeAndWait(() -> {
-						piano.playNote(note);
-					});
-					// Show note progress on roll
-					double noteStart = time;
-					double noteEnd = time + notes.get(i).soundDuration();
-					while(synth.getCurrentTime() < noteEnd) {
-						SwingUtilities.invokeAndWait(() -> {
-							double progress = (synth.getCurrentTime() - noteStart) / (noteEnd - noteStart);
-							roll.setProgress(note, progress);
-						});
-					}
-					SwingUtilities.invokeAndWait(() -> {
-						roll.setProgress(note, 1.0);
-					});
-					time = noteEnd;
-				}
-			}
-		}
-		catch (InterruptedException | InvocationTargetException e) {
-		}
-		finally {
-			SwingUtilities.invokeLater(() -> {
-				roll.setMeasure(track.measures.get(0));
-				piano.playNote(null);
-			});
+		else {
+			player.start();
 		}
 	}
 }

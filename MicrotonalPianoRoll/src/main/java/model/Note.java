@@ -29,7 +29,7 @@ public class Note {
 		return 1.0 / len;
 	}
 	
-	public double soundDuration() {
+	public double duration() {
 		return 240.0 / bpm / len;
 	}
 	

@@ -1,5 +1,8 @@
 package main;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.jsyn.JSyn;
 import com.jsyn.Synthesizer;
 import com.jsyn.unitgen.LineOut;
@@ -36,14 +39,14 @@ public class Synth {
 		out.start();
 	}
 	
-	public void releaseAll() {
+	public void play(Set<Integer> chord) {
 		for (int i = 0; i < keys.length; i++) {
-			keys[i].amplitude.set(0);
+			keys[i].amplitude.set(chord.contains(i) ? 1 : 0);
 		}
 	}
 	
-	public void hold(int key) {
-		keys[key].amplitude.set(1);
+	public void mute() {
+		play(new HashSet<>());
 	}
 	
 	public double getCurrentTime() {

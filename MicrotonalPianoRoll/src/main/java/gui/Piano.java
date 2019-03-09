@@ -2,10 +2,10 @@ package gui;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.JPanel;
-
-import model.Note;
 
 public class Piano extends JPanel {
 
@@ -23,9 +23,13 @@ public class Piano extends JPanel {
 		setPreferredSize(new Dimension(Const.KEY_SIZE.width, numKeys * Const.KEY_SIZE.height));
 	}
 	
-	void playNote(Note note) {
+	void play(Set<Integer> chord) {
 		for (int i = 0; i < keys.length; i++) {
-			keys[i].setSelected(note != null && note.values.contains(i));
+			keys[i].setSelected(chord.contains(i));
 		}
+	}
+	
+	public void mute() {
+		play(new HashSet<>());
 	}
 }

@@ -12,7 +12,6 @@ public class MainClass {
 	
 	public static void main(String[] args) throws SAXException, InterruptedException {
 		Track track = new SongReader(new File("lifeeternal.xml")).read();
-		GUI gui = new GUI(track);
-		gui.play();
+		new GUI(track);
 	}
 }
