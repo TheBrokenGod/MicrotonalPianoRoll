@@ -1,14 +1,14 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Note {
 
 	private final int len;
 	public final int bpm;
-	public final List<Integer> values;
+	public final Set<Integer> values;
 	
 	public Note(String len, int bpm) {
 		this.bpm = bpm;
@@ -18,7 +18,7 @@ public class Note {
 		else {
 			this.len = 3 * Integer.parseInt(len.substring(0, len.length() - 1)) / 2;
 		}
-		values = new ArrayList<>();
+		values = new HashSet<>();
 	}
 	
 	public void add(int value) {

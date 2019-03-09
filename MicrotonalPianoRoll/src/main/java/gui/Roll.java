@@ -1,46 +1,57 @@
 package gui;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 import model.Measure;
+import model.Note;
 
 class Roll extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
 	private final int numRows;
-	final ProgressBar progress;
+//	private Measure measure;
+	private Map<Note, List<RollNote>> notes;
 	
 	Roll(int numRows) {
-		setLayout(new GridLayout(numRows + 1, 1));
-		progress = new ProgressBar(this);
 		this.numRows = numRows;
-		setPreferredSize(new Dimension(Const.ROLL_SIZE.width, (numRows + 1) * Const.ROLL_SIZE.height));
+		setLayout(new GridLayout(numRows, 1));
+		setPreferredSize(new Dimension(Const.ROLL_SIZE.width, numRows * Const.ROLL_SIZE.height));
 	}
 	
-	public void setActiveMeasure(Measure measure) {
+	public void setMeasure(Measure measure) {
 		removeAll();
-		add(progress);
+//		this.measure = measure;
+		this.notes = new HashMap<>();
+		measure.notes.forEach(note -> notes.put(note, new ArrayList<>()));
+		// Build a row for each key
 		for(int i = 0; i < numRows; i++) {
 			JPanel row = new JPanel();
 			row.setLayout(new BoxLayout(row, BoxLayout.LINE_AXIS));
-			for (int j = 0; j < measure.notes.size(); j++) {
-				row.add(buildRollHole(measure.notes.get(j).logicalLength(), i % 2 == 0));				
+			// Row structure is that of the measure
+			for(Note note : measure.notes) {
+				RollNote rollNote = new RollNote(note.logicalLength(), i % 2 == 0);
+				if(note.values.contains(i)) {
+					rollNote.setSelected(true);
+					notes.get(note).add(rollNote);
+				}
+				row.add(rollNote);
+				notes.putIfAbsent(note, new ArrayList<>());
 			}
-			add(row);
+			add(row, 0);
 		}
 		revalidate();
 	}
-	
-	private static Component buildRollHole(double length, boolean evenRow) {
-		JPanel hole = new JPanel(new GridLayout(1, 1));
-		hole.setPreferredSize(new Dimension((int) Math.round(length * Const.ROLL_SIZE.width), Const.ROLL_SIZE.height));
-		hole.add(new Hole(evenRow));
-		return hole;
+
+	public void setProgress(Note note, double progress) {
+		notes.get(note).forEach(rollNote -> rollNote.setProgress(progress));
 	}
 }

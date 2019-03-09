@@ -20,8 +20,10 @@ public class Const {
 	
 	static final Dimension ROLL_SIZE = new Dimension(4 * KEY_SIZE.width, KEY_SIZE.height);
 	static final Border HOLE_BORDER = BorderFactory.createLineBorder(Color.GRAY, BORDER_THICKNESS);
-	static final Color HOLE_COLOR_EVEN = new Color(0xEE, 0xEE, 0xEE);
-	static final Color HOLE_COLOR_ODD = Color.WHITE;
+	static final Color ROLLNOTE_COLOR_EVEN = new Color(0xEE, 0xEE, 0xEE);
+	static final Color ROLLNOTE_COLOR_ODD = Color.WHITE;
+	static final Color ROLLNOTE_COLOR2_EVEN = new Color(0x55, 0xEE, 0x55);
+	static final Color ROLLNOTE_COLOR2_ODD = new Color(0x66, 0xFF, 0x66);
 	static final Image ICON;
 	static {
 		try {
@@ -31,7 +33,4 @@ public class Const {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	static final float PROGRESS_HEIGHT = 0.5f;
-	static final Color PROGRESS_COLOR = Color.GREEN;
 }

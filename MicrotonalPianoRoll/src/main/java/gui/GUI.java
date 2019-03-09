@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -31,7 +32,7 @@ public class GUI extends JFrame implements KeyListener {
 	
 	private Track track;
 	private Synth synth;
-	private Keyboard keyboard;
+	private Piano piano;
 	private Roll roll;
 	private Thread[] player;
 	private Double playerStart;
@@ -39,7 +40,7 @@ public class GUI extends JFrame implements KeyListener {
 	public GUI(Track track) {
 		buildMenu();
 		JPanel root = new JPanel();
-		root.setLayout(new BoxLayout(root, BoxLayout.PAGE_AXIS));
+		root.setLayout(new BoxLayout(root, BoxLayout.LINE_AXIS));
 		setContentPane(root);		
 		setTrack(track);
 		player = null;
@@ -57,14 +58,11 @@ public class GUI extends JFrame implements KeyListener {
 			synth.dispose();
 		}
 		synth = new Synth(track, SawtoothOscillator.class);
-		keyboard = new Keyboard(track.numKeys);
+		piano = new Piano(track.numKeys);
 		roll = new Roll(track.numKeys);
-		JPanel root = new JPanel();
-		root.setLayout(new BoxLayout(root, BoxLayout.LINE_AXIS));
-		root.add(keyboard);
-		root.add(Box.createRigidArea(new Dimension(10, 1)));
-		root.add(roll);
-		getContentPane().add(root);
+		getContentPane().add(piano);
+		getContentPane().add(Box.createRigidArea(new Dimension(10, 1)));
+		getContentPane().add(roll);
 		pack();
 	}
 	
@@ -144,7 +142,6 @@ public class GUI extends JFrame implements KeyListener {
 		switch(e.getKeyCode())
 		{
 		case KeyEvent.VK_S:
-			System.err.println("S pressed");
 			break;
 		}
 	}
@@ -203,16 +200,31 @@ public class GUI extends JFrame implements KeyListener {
 	private void visualPlay() {
 		double time = playerStart;
 		try {
+			// Rebuild roll for current measure
 			for(Measure measure : track.measures) {
 				SwingUtilities.invokeAndWait(() -> {
-					roll.setActiveMeasure(measure);
+					roll.setMeasure(measure);
 				});
-				for(Note note : measure.notes) {
+				List<Note> notes = measure.notes;
+				for(int i = 0; i < notes.size(); i++) {
+					Note note = notes.get(i);
+					// Hold piano keys of current note
 					SwingUtilities.invokeAndWait(() -> {
-						keyboard.deselectAll();
-						note.values.forEach(key -> keyboard.select(key));
+						piano.playNote(note);
 					});
-					synth.sleepUntil(time += note.soundDuration());
+					// Show note progress on roll
+					double noteStart = time;
+					double noteEnd = time + notes.get(i).soundDuration();
+					while(synth.getCurrentTime() < noteEnd) {
+						SwingUtilities.invokeAndWait(() -> {
+							double progress = (synth.getCurrentTime() - noteStart) / (noteEnd - noteStart);
+							roll.setProgress(note, progress);
+						});
+					}
+					SwingUtilities.invokeAndWait(() -> {
+						roll.setProgress(note, 1.0);
+					});
+					time = noteEnd;
 				}
 			}
 		}
@@ -220,8 +232,8 @@ public class GUI extends JFrame implements KeyListener {
 		}
 		finally {
 			SwingUtilities.invokeLater(() -> {
-				roll.setActiveMeasure(track.measures.get(0));
-				keyboard.deselectAll();
+				roll.setMeasure(track.measures.get(0));
+				piano.playNote(null);
 			});
 		}
 	}
