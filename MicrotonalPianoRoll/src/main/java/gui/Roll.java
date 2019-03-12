@@ -19,7 +19,6 @@ class Roll extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private final int numRows;
-//	private Measure measure;
 	private Map<Note, List<RollNote>> notes;
 	
 	Roll(Track track) {
@@ -29,9 +28,8 @@ class Roll extends JPanel {
 		setPreferredSize(new Dimension(Const.ROLL_SIZE.width, track.numKeys * Const.ROLL_SIZE.height));
 	}
 	
-	public void setMeasure(Measure measure) {
+	void setMeasure(Measure measure) {
 		removeAll();
-//		this.measure = measure;
 		this.notes = new HashMap<>();
 		measure.notes.forEach(note -> notes.put(note, new ArrayList<>()));
 		// Build a row for each key
@@ -53,7 +51,11 @@ class Roll extends JPanel {
 		revalidate();
 	}
 
-	public void setProgress(Note note, double progress) {
+	void setProgress(Note note, double progress) {
 		notes.get(note).forEach(rollNote -> rollNote.setProgress(progress));
+	}
+	
+	void clearProgress() {
+		notes.values().forEach(list -> list.forEach(rollNote -> rollNote.setProgress(0)));
 	}
 }

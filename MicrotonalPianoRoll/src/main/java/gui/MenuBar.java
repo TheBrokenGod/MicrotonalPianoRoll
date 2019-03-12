@@ -20,12 +20,12 @@ class MenuBar extends JMenuBar {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final App gui;
+	private final App app;
 	private final Track track;
-	private JLabel measure;
+	private final JLabel measure;
 	
-	MenuBar(App gui, Track track) {
-		this.gui = gui;
+	MenuBar(App app, Track track) {
+		this.app = app;
 		this.track = track;
 		buildMenus();
 		JPanel panel = new JPanel(new GridLayout(1, 1));
@@ -48,21 +48,21 @@ class MenuBar extends JMenuBar {
 		menu.add(buildMenuItem("Save as", null, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
 		menu.addSeparator();
 		menu.add(buildMenuItem("Set audio", null, KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
-		menu.add(buildMenuItem("Play", gui::startOrStop, KeyEvent.VK_SPACE, 0));
+		menu.add(buildMenuItem("Play", app::startOrStop, KeyEvent.VK_SPACE, 0));
 		menu.addSeparator();
 		menu.add(buildMenuItem("Exit", null, null, null));		
 		add(menu = new JMenu("Navigation"));
 		menu.add(sub = new JMenu("Measure"));
-		sub.add(buildMenuItem("Previous", null, KeyEvent.VK_LEFT, 0));
-		sub.add(buildMenuItem("Next", null, KeyEvent.VK_RIGHT, 0));
+		sub.add(buildMenuItem("Previous", app::previousMeasure, KeyEvent.VK_LEFT, 0));
+		sub.add(buildMenuItem("Next", app::nextMeasure, KeyEvent.VK_RIGHT, 0));
 		sub.addSeparator();
-		sub.add(buildMenuItem("First", null, KeyEvent.VK_HOME, 0));
-		sub.add(buildMenuItem("Last", null, KeyEvent.VK_END, 0));
+		sub.add(buildMenuItem("First", app::firstMeasure, KeyEvent.VK_HOME, 0));
+		sub.add(buildMenuItem("Last", app::lastMeasure, KeyEvent.VK_END, 0));
 		sub.addSeparator();
-		sub.add(buildMenuItem("By index", null, KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("By index", null, KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(sub = new JMenu("Tempo change"));
-		sub.add(buildMenuItem("Previous", null, KeyEvent.VK_PAGE_UP, 0));
-		sub.add(buildMenuItem("Next", null, KeyEvent.VK_PAGE_DOWN, 0));
+		sub.add(buildMenuItem("Previous", null, KeyEvent.VK_LEFT, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("Next", null, KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK));
 		add(menu = new JMenu("Composition"));
 		menu.add(sub = new JMenu("Resolution"));
 		ButtonGroup res = new ButtonGroup();
@@ -79,14 +79,20 @@ class MenuBar extends JMenuBar {
 		sub.add(buildRadioItem("16T", res));
 		sub.add(buildRadioItem("32T", res));
 		sub.addSeparator();
+		sub.add(buildRadioItem("2.", res));
+		sub.add(buildRadioItem("4.", res));
+		sub.add(buildRadioItem("8.", res));
+		sub.add(buildRadioItem("16.", res));
+		sub.add(buildRadioItem("32.", res));
+		sub.addSeparator();
 		sub.add(buildMenuItem("Increase", null, KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK));
 		sub.add(buildMenuItem("Decrease", null, KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(sub = new JMenu("Measure"));
-		sub.add(buildMenuItem("Insert", null, null, null));
-		sub.add(buildMenuItem("Delete", null, null, null));
+		sub.add(buildMenuItem("Insert", null, KeyEvent.VK_INSERT, null));
+		sub.add(buildMenuItem("Delete", null, KeyEvent.VK_DELETE, null));
 		menu.add(sub = new JMenu("Tempo change"));
-		sub.add(buildMenuItem("Set", null, null, null));
-		sub.add(buildMenuItem("Clear", null, null, null));
+		sub.add(buildMenuItem("Set", null, KeyEvent.VK_INSERT, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("Clear", null, KeyEvent.VK_DELETE, KeyEvent.CTRL_DOWN_MASK));
 		add(menu = new JMenu("About"));
 		menu.add(buildMenuItem("Info", null, null, null));
 	}

@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
-import model.Measure;
 import model.Note;
 
 class Player {
@@ -22,9 +21,6 @@ class Player {
 	}
 	
 	void start() {
-		if(threads != null) {
-			stop();
-		}
 		threads = Arrays.asList(new Thread(this::audio), new Thread(this::piano), new Thread(this::roll));
 		threads.forEach(thread -> thread.setPriority(Thread.MAX_PRIORITY));
 		startTime = app.synth.getCurrentTime();
@@ -32,7 +28,7 @@ class Player {
 	}
 
 	public boolean isPlaying() {
-		return threads != null && threads.get(0).isAlive();
+		return threads != null;
 	}
 	
 	void stop() {
@@ -51,8 +47,9 @@ class Player {
 	private void audio() {
 		double time = this.startTime;
 		try {
-			for(Measure measure : app.track.measures) {
-				for(Note note : measure.notes) {
+			// Resume playing at the current measure
+			for(int i = app.currentMeasure(); i < app.track.measures.size(); i++) {
+				for(Note note : app.track.measures.get(i).notes) {
 					app.synth.play(note);
 					app.synth.sleepUntil(time += note.duration());
 				}
@@ -70,9 +67,9 @@ class Player {
 		try {
 			// Disable piano input during playback
 			SwingUtilities.invokeAndWait(() -> app.setInteractive(false));
-			for(Measure measure : app.track.measures) {
-				for(Note note : measure.notes) {
-					// Press played keys
+			for(int i = app.currentMeasure(); i < app.track.measures.size(); i++) {
+				for(Note note : app.track.measures.get(i).notes) {
+					// Show played keys as pressed
 					SwingUtilities.invokeAndWait(() -> app.piano.play(note));
 					app.synth.sleepUntil(time += note.duration());
 				}
@@ -81,21 +78,23 @@ class Player {
 		catch (InterruptedException | InvocationTargetException e) {
 		}
 		finally {
-			app.piano.stop();
-			SwingUtilities.invokeLater(() -> app.setInteractive(true));
+			SwingUtilities.invokeLater(() -> {
+				app.piano.stop();
+				app.setInteractive(true);
+			});
 		}
 	}
 	
 	private void roll() {
 		double time = this.startTime;
 		try {
-			for(Measure measure : app.track.measures) {
+			for(int i = app.currentMeasure(); i < app.track.measures.size(); i++) {
+				Integer measure = i;
 				// Rebuild roll with current measure
 				SwingUtilities.invokeAndWait(() -> {
-					app.roll.setMeasure(measure);
-					app.bar.setMeasure(measure);
+					app.setMeasure(measure);
 				});
-				for(Note note : measure.notes) {
+				for(Note note : app.track.measures.get(i).notes) {
 					// Paint current note progress
 					double start = time;
 					double end = time + note.duration();
@@ -110,14 +109,11 @@ class Player {
 					time = end;
 				}
 			}
+			// Playback finished then rewind
+			SwingUtilities.invokeLater(() -> app.setMeasure(0));
 		}
 		catch (InterruptedException | InvocationTargetException e) {
-		}
-		finally {
-			SwingUtilities.invokeLater(() -> {
-				app.roll.setMeasure(app.track.measures.get(0));
-				app.bar.setMeasure(app.track.measures.get(0));
-			});
+			SwingUtilities.invokeLater(() -> app.roll.clearProgress());
 		}
 	}
 }

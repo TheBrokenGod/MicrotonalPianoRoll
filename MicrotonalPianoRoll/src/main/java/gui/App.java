@@ -10,7 +10,10 @@ import javax.swing.JPanel;
 import com.jsyn.unitgen.SawtoothOscillator;
 
 import main.Synth;
+import model.Measure;
+import model.Note;
 import model.Track;
+import net.sf.saxon.s9api.SaxonApiException;
 
 public class App extends JFrame {
 
@@ -22,6 +25,7 @@ public class App extends JFrame {
 	Synth synth;
 	Roll roll;
 	private Player player;
+	private int measure;
 
 	public App(Track track) {
 		JPanel root = new JPanel();
@@ -34,7 +38,7 @@ public class App extends JFrame {
 		setVisible(true);
 	}
 
-	public void setTrack(Track track) {
+	void setTrack(Track track) {
 		if(piano != null) {
 			removeKeyListener(piano);
 			synth.dispose();
@@ -48,6 +52,7 @@ public class App extends JFrame {
 		getContentPane().add(piano);
 		getContentPane().add(Box.createRigidArea(new Dimension(10, 1)));
 		getContentPane().add(roll);
+		setMeasure(0);
 		pack();
 	}
 	
@@ -62,10 +67,53 @@ public class App extends JFrame {
 	
 	void setInteractive(boolean isInteractive) {
 		if(isInteractive) {
+			if(player.isPlaying()) {
+				player.stop();
+			}
 			addKeyListener(piano);
 		}
 		else {
 			removeKeyListener(piano);
 		}
+	}
+	
+	void previousMeasure() {
+		setInteractive(true);
+		if(measure > 0) {
+			setMeasure(measure - 1);
+		}
+	}
+	
+	int currentMeasure() {
+		return measure;
+	}
+	
+	void nextMeasure() {
+		setInteractive(true);
+		if(measure == track.measures.size() - 1) {
+			try {
+				track.measures.add(new Measure().add(new Note("1", 60)));
+			} 
+			catch (SaxonApiException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		setMeasure(measure + 1);
+	}
+	
+	void firstMeasure() {
+		setInteractive(true);
+		setMeasure(0);
+	}
+	
+	void lastMeasure() {
+		setInteractive(true);
+		setMeasure(track.measures.size() - 1);
+	}
+	
+	void setMeasure(int measure) {
+		this.measure = measure;
+		roll.setMeasure(track.measures.get(measure));
+		bar.setMeasure(track.measures.get(measure));
 	}
 }
