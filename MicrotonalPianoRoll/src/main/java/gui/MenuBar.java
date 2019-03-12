@@ -1,78 +1,57 @@
 package gui;
 
-import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 
-import com.jsyn.unitgen.SawtoothOscillator;
-
-import main.Synth;
+import model.Measure;
 import model.Track;
 
-public class GUI extends JFrame implements KeyListener {
+class MenuBar extends JMenuBar {
 
 	private static final long serialVersionUID = 1L;
 	
-	Track track;
-	Synth synth;
-	Piano piano;
-	Roll roll;
-	private Player player;
-
-	public GUI(Track track) {
-		buildMenu();
-		JPanel root = new JPanel();
-		root.setLayout(new BoxLayout(root, BoxLayout.LINE_AXIS));
-		setContentPane(root);		
-		setTrack(track);
-		player = new Player(this);
-		addKeyListener(this);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setVisible(true);
-	}
-
-	public void setTrack(Track track) {
+	private final App gui;
+	private final Track track;
+	private JLabel measure;
+	
+	MenuBar(App gui, Track track) {
+		this.gui = gui;
 		this.track = track;
-		setTitle("Microtonal Piano Roll :: " + track.toString());
-		if(synth != null) {
-			synth.dispose();
-		}
-		synth = new Synth(track, SawtoothOscillator.class);
-		piano = new Piano(track.numKeys);
-		roll = new Roll(track.numKeys);
-		getContentPane().add(piano);
-		getContentPane().add(Box.createRigidArea(new Dimension(10, 1)));
-		getContentPane().add(roll);
-		pack();
+		buildMenus();
+		JPanel panel = new JPanel(new GridLayout(1, 1));
+		panel.setOpaque(false);
+		panel.add(measure = new JLabel("", SwingConstants.RIGHT));
+		add(panel);
+		setMeasure(track.measures.get(0));
 	}
 	
-	private void buildMenu() {
-		JMenuBar bar = new JMenuBar();
-		setJMenuBar(bar);
+	void setMeasure(Measure measure) {
+		this.measure.setText("Measure " + (track.measures.indexOf(measure) + 1) + " of " + track.measures.size() + " ");
+	}
+	
+	private void buildMenus() {
 		JMenu menu, sub;
-		bar.add(menu = new JMenu("Track"));
+		add(menu = new JMenu("Track"));
 		menu.add(buildMenuItem("New", null, KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Open", null, KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Save", null, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Save as", null, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
 		menu.addSeparator();
 		menu.add(buildMenuItem("Set audio", null, KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
-		menu.add(buildMenuItem("Play", this::startOrStop, KeyEvent.VK_SPACE, 0));
+		menu.add(buildMenuItem("Play", gui::startOrStop, KeyEvent.VK_SPACE, 0));
 		menu.addSeparator();
 		menu.add(buildMenuItem("Exit", null, null, null));		
-		bar.add(menu = new JMenu("Navigation"));
+		add(menu = new JMenu("Navigation"));
 		menu.add(sub = new JMenu("Measure"));
 		sub.add(buildMenuItem("Previous", null, KeyEvent.VK_LEFT, 0));
 		sub.add(buildMenuItem("Next", null, KeyEvent.VK_RIGHT, 0));
@@ -84,7 +63,7 @@ public class GUI extends JFrame implements KeyListener {
 		menu.add(sub = new JMenu("Tempo change"));
 		sub.add(buildMenuItem("Previous", null, KeyEvent.VK_PAGE_UP, 0));
 		sub.add(buildMenuItem("Next", null, KeyEvent.VK_PAGE_DOWN, 0));
-		bar.add(menu = new JMenu("Composition"));
+		add(menu = new JMenu("Composition"));
 		menu.add(sub = new JMenu("Resolution"));
 		ButtonGroup res = new ButtonGroup();
 		sub.add(buildRadioItem("1", res));
@@ -108,7 +87,7 @@ public class GUI extends JFrame implements KeyListener {
 		menu.add(sub = new JMenu("Tempo change"));
 		sub.add(buildMenuItem("Set", null, null, null));
 		sub.add(buildMenuItem("Clear", null, null, null));
-		bar.add(menu = new JMenu("About"));
+		add(menu = new JMenu("About"));
 		menu.add(buildMenuItem("Info", null, null, null));
 	}
 	
@@ -127,38 +106,5 @@ public class GUI extends JFrame implements KeyListener {
 		JRadioButtonMenuItem radio = new JRadioButtonMenuItem(text);
 		group.add(radio);
 		return radio;
-	}
-
-	@Override	
-	public void keyPressed(KeyEvent e) {
-		switch(e.getKeyCode())
-		{
-		case KeyEvent.VK_S:
-			break;
-		}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		switch(e.getKeyCode())
-		{
-		case KeyEvent.VK_SPACE:
-			break;
-		default:
-			break;
-		}
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-	}
-	
-	private void startOrStop() {
-		if(player.isPlaying()) {
-			player.stop();
-		}
-		else {
-			player.start();
-		}
 	}
 }

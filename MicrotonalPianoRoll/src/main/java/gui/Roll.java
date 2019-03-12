@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 
 import model.Measure;
 import model.Note;
+import model.Track;
 
 class Roll extends JPanel {
 
@@ -21,10 +22,11 @@ class Roll extends JPanel {
 //	private Measure measure;
 	private Map<Note, List<RollNote>> notes;
 	
-	Roll(int numRows) {
-		this.numRows = numRows;
-		setLayout(new GridLayout(numRows, 1));
-		setPreferredSize(new Dimension(Const.ROLL_SIZE.width, numRows * Const.ROLL_SIZE.height));
+	Roll(Track track) {
+		this.numRows = track.numKeys;
+		setLayout(new GridLayout(track.numKeys, 1));
+		setMeasure(track.measures.get(0));
+		setPreferredSize(new Dimension(Const.ROLL_SIZE.width, track.numKeys * Const.ROLL_SIZE.height));
 	}
 	
 	public void setMeasure(Measure measure) {

@@ -1,19 +1,17 @@
 package main;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.jsyn.JSyn;
 import com.jsyn.Synthesizer;
 import com.jsyn.unitgen.LineOut;
 import com.jsyn.unitgen.MixerMono;
 import com.jsyn.unitgen.UnitOscillator;
 
+import model.Note;
 import model.Track;
 
 public class Synth {
 
-	public final Synthesizer synth;
+	private final Synthesizer synth;
 	private final UnitOscillator[] keys;
 	private final MixerMono mixer;
 	private final LineOut out;
@@ -39,14 +37,23 @@ public class Synth {
 		out.start();
 	}
 	
-	public void play(Set<Integer> chord) {
+	public void play(Note note) {
+		stop();
+		note.values.forEach(key -> play(key));
+	}
+
+	public void play(int key) {
+		keys[key].amplitude.set(1);
+	}
+	
+	public void stop() {
 		for (int i = 0; i < keys.length; i++) {
-			keys[i].amplitude.set(chord.contains(i) ? 1 : 0);
+			stop(i);
 		}
 	}
 	
-	public void mute() {
-		play(new HashSet<>());
+	public void stop(int key) {
+		keys[key].amplitude.set(0);
 	}
 	
 	public double getCurrentTime() {
