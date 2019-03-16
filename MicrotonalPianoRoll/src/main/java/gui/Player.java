@@ -48,10 +48,10 @@ class Player {
 		double time = this.startTime;
 		try {
 			// Resume playing at the current measure
-			for(int i = app.currentMeasure(); i < app.track.measures.size(); i++) {
-				for(Note note : app.track.measures.get(i).notes) {
+			for(int i = app.currentMeasure(); i < app.track.measuresCount(); i++) {
+				for(Note note : app.track.measure(i)) {
 					app.synth.play(note);
-					app.synth.sleepUntil(time += note.duration());
+					app.synth.sleepUntil(time += note.length.absolute());
 				}
 			}
 		}
@@ -67,11 +67,11 @@ class Player {
 		try {
 			// Disable piano input during playback
 			SwingUtilities.invokeAndWait(() -> app.setInteractive(false));
-			for(int i = app.currentMeasure(); i < app.track.measures.size(); i++) {
-				for(Note note : app.track.measures.get(i).notes) {
+			for(int i = app.currentMeasure(); i < app.track.measuresCount(); i++) {
+				for(Note note : app.track.measure(i)) {
 					// Show played keys as pressed
 					SwingUtilities.invokeAndWait(() -> app.piano.play(note));
-					app.synth.sleepUntil(time += note.duration());
+					app.synth.sleepUntil(time += note.length.absolute());
 				}
 			}
 		}
@@ -88,16 +88,16 @@ class Player {
 	private void roll() {
 		double time = this.startTime;
 		try {
-			for(int i = app.currentMeasure(); i < app.track.measures.size(); i++) {
+			for(int i = app.currentMeasure(); i < app.track.measuresCount(); i++) {
 				Integer measure = i;
 				// Rebuild roll with current measure
 				SwingUtilities.invokeAndWait(() -> {
 					app.setMeasure(measure);
 				});
-				for(Note note : app.track.measures.get(i).notes) {
+				for(Note note : app.track.measure(i)) {
 					// Paint current note progress
 					double start = time;
-					double end = time + note.duration();
+					double end = time + note.length.absolute();
 					while(app.synth.getCurrentTime() < end) {
 						SwingUtilities.invokeAndWait(() -> {
 							double progress = (app.synth.getCurrentTime() - start) / (end - start);
@@ -110,7 +110,7 @@ class Player {
 				}
 			}
 			// Playback finished then rewind
-			SwingUtilities.invokeLater(() -> app.setMeasure(0));
+			SwingUtilities.invokeAndWait(() -> app.setMeasure(0));
 		}
 		catch (InterruptedException | InvocationTargetException e) {
 			SwingUtilities.invokeLater(() -> app.roll.clearProgress());

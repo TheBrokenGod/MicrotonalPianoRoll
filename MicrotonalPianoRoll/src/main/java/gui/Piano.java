@@ -31,7 +31,7 @@ public class Piano extends JPanel implements KeyListener {
 	
 	void play(Note note) {
 		stop();
-		note.values.forEach(key -> keys[key].setSelected(true));
+		note.forEach(key -> keys[key].setSelected(true));
 	}
 	
 	void stop() {

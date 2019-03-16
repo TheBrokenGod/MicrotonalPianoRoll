@@ -4,23 +4,23 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
-class RollNote extends JPanel {
+class RollValue extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final boolean evenRow;
-	private final NoteButton button;
+	final NoteButton button;
 	private double progress;
 	
-	public RollNote(double noteLength, boolean evenRow) {
-		this.evenRow = evenRow;
+	public RollValue(App app, int note, int row, double length) {
 		setLayout(new GridLayout(1, 1));
-		add(button = new NoteButton());
-		setPreferredSize(new Dimension((int) Math.round(noteLength * Const.ROLL_SIZE.width), Const.ROLL_SIZE.height));
+		add(button = new NoteButton(app, note, row));
+		setPreferredSize(new Dimension((int) Math.round(length * Const.ROLL_SIZE.width), Const.ROLL_SIZE.height));
 		progress = 0;
 	}
 	
@@ -37,19 +37,27 @@ class RollNote extends JPanel {
 		button.repaint();
 	}
 	
-	private class NoteButton extends JToggleButton {
+	class NoteButton extends JToggleButton implements ActionListener {
 
 		private static final long serialVersionUID = 1L;
+
+		private final App app;
+		private final int note;
+		private final int row;
 		
-		NoteButton() { 
+		NoteButton(App app, int note, int row) {
+			this.app = app;
+			this.note = note;
+			this.row = row;
 			setBorder(Const.HOLE_BORDER);
 			setFocusable(false);
+			addActionListener(this);
 		}
 		
 		@Override
 		protected void paintComponent(Graphics g) {
 			// Paint base color
-			g.setColor(evenRow ? Const.ROLLNOTE_COLOR_EVEN : Const.ROLLNOTE_COLOR_ODD);
+			g.setColor(row % 2 == 0 ? Const.ROLLNOTE_COLOR_EVEN : Const.ROLLNOTE_COLOR_ODD);
 			if(isSelected()) {
 				g.setColor(g.getColor().darker());
 			}
@@ -59,9 +67,14 @@ class RollNote extends JPanel {
 			// If played paint progress
 			if(isSelected()) {
 				int width = (int) (progress * (getWidth() - border.left - border.right));
-				g.setColor(evenRow ? Const.ROLLNOTE_COLOR2_EVEN : Const.ROLLNOTE_COLOR2_ODD);
+				g.setColor(row % 2 == 0 ? Const.ROLLNOTE_COLOR2_EVEN : Const.ROLLNOTE_COLOR2_ODD);
 				g.fillRect(border.left, border.top, width, size.height);
 			}
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			app.noteChanged(note, row, isSelected());
 		}
 	}
 }

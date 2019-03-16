@@ -2,7 +2,9 @@ package gui;
 
 import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
+import java.util.Enumeration;
 
+import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -13,7 +15,6 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
-import model.Measure;
 import model.Track;
 
 class MenuBar extends JMenuBar {
@@ -23,26 +24,40 @@ class MenuBar extends JMenuBar {
 	private final App app;
 	private final Track track;
 	private final JLabel measure;
+	private final ButtonGroup group;
 	
 	MenuBar(App app, Track track) {
 		this.app = app;
 		this.track = track;
+		group = new ButtonGroup();
 		buildMenus();
 		JPanel panel = new JPanel(new GridLayout(1, 1));
 		panel.setOpaque(false);
 		panel.add(measure = new JLabel("", SwingConstants.RIGHT));
 		add(panel);
-		setMeasure(track.measures.get(0));
 	}
 	
-	void setMeasure(Measure measure) {
-		this.measure.setText("Measure " + (track.measures.indexOf(measure) + 1) + " of " + track.measures.size() + " ");
+	void setMeasure(int measure) {
+		this.measure.setText("Measure " + (measure + 1) + " of " + track.measuresCount() + " ");
+		// Keep resolution selection consistent with the last note of the measure
+		Enumeration<AbstractButton> buttons = group.getElements();
+		while(buttons.hasMoreElements()) {
+			AbstractButton res = buttons.nextElement();
+			if(res.getText().equals(track.measure(measure).lastNote().length.name())) {
+				res.setSelected(true);
+				break;
+			}
+		}
+	}
+	
+	String getResolution() {
+		return group.getSelection().getActionCommand();
 	}
 	
 	private void buildMenus() {
 		JMenu menu, sub;
 		add(menu = new JMenu("Track"));
-		menu.add(buildMenuItem("New", null, KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("New", app::newFile, KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Open", null, KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Save", null, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Save as", null, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
@@ -65,25 +80,18 @@ class MenuBar extends JMenuBar {
 		sub.add(buildMenuItem("Next", null, KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK));
 		add(menu = new JMenu("Composition"));
 		menu.add(sub = new JMenu("Resolution"));
-		ButtonGroup res = new ButtonGroup();
-		sub.add(buildRadioItem("1", res));
-		sub.add(buildRadioItem("2", res));
-		sub.add(buildRadioItem("4", res));
-		sub.add(buildRadioItem("8", res));
-		sub.add(buildRadioItem("16", res));
-		sub.add(buildRadioItem("32", res));
+		sub.add(buildRadioItem(app, "1", group));
+		sub.add(buildRadioItem(app, "2", group));
+		sub.add(buildRadioItem(app, "4", group));
+		sub.add(buildRadioItem(app, "8", group));
+		sub.add(buildRadioItem(app, "16", group));
+		sub.add(buildRadioItem(app, "32", group));
 		sub.addSeparator();
-		sub.add(buildRadioItem("2T", res));
-		sub.add(buildRadioItem("4T", res));
-		sub.add(buildRadioItem("8T", res));
-		sub.add(buildRadioItem("16T", res));
-		sub.add(buildRadioItem("32T", res));
-		sub.addSeparator();
-		sub.add(buildRadioItem("2.", res));
-		sub.add(buildRadioItem("4.", res));
-		sub.add(buildRadioItem("8.", res));
-		sub.add(buildRadioItem("16.", res));
-		sub.add(buildRadioItem("32.", res));
+		sub.add(buildRadioItem(app, "2T", group));
+		sub.add(buildRadioItem(app, "4T", group));
+		sub.add(buildRadioItem(app, "8T", group));
+		sub.add(buildRadioItem(app, "16T", group));
+		sub.add(buildRadioItem(app, "32T", group));
 		sub.addSeparator();
 		sub.add(buildMenuItem("Increase", null, KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK));
 		sub.add(buildMenuItem("Decrease", null, KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK));
@@ -108,9 +116,11 @@ class MenuBar extends JMenuBar {
 		return item;
 	}
 	
-	private static JRadioButtonMenuItem buildRadioItem(String text, ButtonGroup group) {
+	private static JRadioButtonMenuItem buildRadioItem(App app, String text, ButtonGroup group) {
 		JRadioButtonMenuItem radio = new JRadioButtonMenuItem(text);
+		radio.getModel().setActionCommand(text);
 		group.add(radio);
+		radio.addActionListener(e -> app.resolutionChanged());
 		return radio;
 	}
 }

@@ -39,7 +39,7 @@ public class Synth {
 	
 	public void play(Note note) {
 		stop();
-		note.values.forEach(key -> play(key));
+		note.forEach(key -> play(key));
 	}
 
 	public void play(int key) {

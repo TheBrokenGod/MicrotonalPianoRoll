@@ -48,16 +48,16 @@ public class SongReader {
 				if(getInt("count(@bpm)", n) == 1) {
 					bpm.set(getInt("@bpm", n, 1));
 				}
-				Note note = new Note(getString("@length", n, 1), bpm.get());
+				Note note = new Note(getString("@length", n, 1));
 				// Read values
 				getList(n, "tokenize(text(), '\\s')").forEach(v -> {
 					note.add(getInt("", v, 0));
 				});
-				track.add(note);
+				track.add(bpm.get(), note);
 			});
 			return track;
 		}
-		catch(SaxonApiUncheckedException e) {
+		catch(IllegalArgumentException e) {
 			throw new SAXException(e);
 		}
 	}

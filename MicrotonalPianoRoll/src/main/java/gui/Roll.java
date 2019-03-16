@@ -19,32 +19,32 @@ class Roll extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private final int numRows;
-	private Map<Note, List<RollNote>> notes;
+	private Map<Note, List<RollValue>> notes;
 	
 	Roll(Track track) {
 		this.numRows = track.numKeys;
 		setLayout(new GridLayout(track.numKeys, 1));
-		setMeasure(track.measures.get(0));
 		setPreferredSize(new Dimension(Const.ROLL_SIZE.width, track.numKeys * Const.ROLL_SIZE.height));
 	}
 	
-	void setMeasure(Measure measure) {
+	void setMeasure(App app, Measure measure) {
 		removeAll();
 		this.notes = new HashMap<>();
-		measure.notes.forEach(note -> notes.put(note, new ArrayList<>()));
+		measure.forEach(note -> notes.put(note, new ArrayList<>()));
 		// Build a row for each key
 		for(int i = 0; i < numRows; i++) {
 			JPanel row = new JPanel();
 			row.setLayout(new BoxLayout(row, BoxLayout.LINE_AXIS));
 			// Row structure is that of the measure
-			for(Note note : measure.notes) {
-				RollNote rollNote = new RollNote(note.logicalLength(), i % 2 == 0);
-				if(note.values.contains(i)) {
+			for(int j = 0; j < measure.notesCount(); j++) {
+				// TODO refactor
+				RollValue rollNote = new RollValue(app, j, i, measure.note(j).length.logical());
+				if(measure.note(j).contains(i)) {
 					rollNote.setSelected(true);
-					notes.get(note).add(rollNote);
+					notes.get(measure.note(j)).add(rollNote);
 				}
 				row.add(rollNote);
-				notes.putIfAbsent(note, new ArrayList<>());
+				notes.putIfAbsent(measure.note(j), new ArrayList<>());
 			}
 			add(row, 0);
 		}
