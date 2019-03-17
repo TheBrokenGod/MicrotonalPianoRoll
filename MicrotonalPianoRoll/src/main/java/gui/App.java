@@ -1,6 +1,8 @@
 package gui;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -12,6 +14,7 @@ import com.jsyn.unitgen.SawtoothOscillator;
 import main.Synth;
 import model.Measure;
 import model.Note;
+import model.NoteLength;
 import model.Track;
 
 public class App extends JFrame {
@@ -58,16 +61,8 @@ public class App extends JFrame {
 	
 	void newFile() {
 		Track track = new Track(440, 880, 12, 0, 12);
-		Measure measure = new Measure(60);
-		fillMeasure(measure);
-		track.add(measure);
+		track.add(new Measure(60, bar.getResolution()));
 		setTrack(track);
-	}
-	
-	void fillMeasure(Measure measure) {
-		while(!measure.isFull()) {
-			measure.add(new Note(bar.getResolution()));
-		}
 	}
 	
 	void startOrStop() {
@@ -105,9 +100,7 @@ public class App extends JFrame {
 	void nextMeasure() {
 		setInteractive(true);
 		if(measure == track.measuresCount() - 1) {
-			Measure measure = new Measure(track.lastMeasure().getBPM());
-			fillMeasure(measure);
-			track.add(measure);
+			track.add(new Measure(track.lastMeasure().getBPM(), bar.getResolution()));
 		}
 		setMeasure(measure + 1);
 	}
@@ -128,14 +121,25 @@ public class App extends JFrame {
 		bar.setMeasure(measure);
 	}
 	
+	// TODO rework from scratch
 	void resolutionChanged() {
 		Measure measure = track.measure(this.measure);
-		// Modify the length of all notes without values (not set) ending the measure
+		// Remove empty notes at the end of the measure
+		List<Note> removed = new ArrayList<>();
 		for(int i = measure.notesCount() - 1; i >= 0 && measure.note(i).isEmpty(); i--) {
-			measure.remove(i);
+			removed.add(0, measure.remove(i));
 		}
-		fillMeasure(measure);
-		setMeasure(this.measure);
+		if(removed.size() > 0) {
+			// Check if empty space can be filled with notes at new resolution
+			if(10 * NoteLength.inverse(bar.getResolution()) % (int)Math.round(10 / measure.freeSpace()) == 0) {
+				measure.fill(bar.getResolution());
+			}
+			else {
+				// Otherwise restore
+				measure.addAll(removed);
+			}
+		}
+		setMeasure(this.measure);	
 	}
 
 	public void noteChanged(int i, int value, boolean selected) {
@@ -145,7 +149,7 @@ public class App extends JFrame {
 		}
 		else {
 			note.remove(value);
-			// May be the rightmost previously enabled note in the measure
+			// May be the new rightmost empty note
 			if(note.isEmpty()) {
 				resolutionChanged();
 			}

@@ -14,6 +14,11 @@ public class Measure implements Iterable<Note> {
 		notes = new ArrayList<>();
 	}
 	
+	public Measure(int bpm, String fillRes) {
+		this(bpm);
+		fill(fillRes);
+	}
+	
 	public boolean isFull() {
 		return freeSpace() == 0;
 	}
@@ -24,6 +29,18 @@ public class Measure implements Iterable<Note> {
 		}
 		notes.add(note);
 		note.length.measure = this;
+		return this;
+	}
+
+	public Measure addAll(List<Note> notes) {
+		notes.forEach(note -> add(note));
+		return this;
+	}
+	
+	public Measure fill(String length) {
+		while(!isFull()) {
+			add(new Note(length));
+		}
 		return this;
 	}
 	
@@ -39,8 +56,8 @@ public class Measure implements Iterable<Note> {
 		return 1.0 - notes.stream().mapToDouble(note -> note.length.logical()).sum();
 	}
 
-	public void remove(int note) {
-		notes.remove(note);
+	public Note remove(int note) {
+		return notes.remove(note);
 	}
 
 	public Note lastNote() {

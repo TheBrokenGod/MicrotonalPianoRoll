@@ -10,17 +10,19 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
-class RollValue extends JPanel {
+import model.NoteLength;
+
+class RollHole extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
 	final NoteButton button;
 	private double progress;
 	
-	public RollValue(App app, int note, int row, double length) {
+	public RollHole(App app, int noteInd, int rowInd, NoteLength length) {
 		setLayout(new GridLayout(1, 1));
-		add(button = new NoteButton(app, note, row));
-		setPreferredSize(new Dimension((int) Math.round(length * Const.ROLL_SIZE.width), Const.ROLL_SIZE.height));
+		add(button = new NoteButton(app, noteInd, rowInd));
+		setPreferredSize(new Dimension((int) Math.round(length.logical() * Const.ROLL_SIZE.width), Const.ROLL_SIZE.height));
 		progress = 0;
 	}
 	
@@ -37,7 +39,7 @@ class RollValue extends JPanel {
 		button.repaint();
 	}
 	
-	class NoteButton extends JToggleButton implements ActionListener {
+	private class NoteButton extends JToggleButton implements ActionListener {
 
 		private static final long serialVersionUID = 1L;
 

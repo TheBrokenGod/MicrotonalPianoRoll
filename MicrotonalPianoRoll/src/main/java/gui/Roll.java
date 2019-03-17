@@ -19,7 +19,7 @@ class Roll extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private final int numRows;
-	private Map<Note, List<RollValue>> notes;
+	private Map<Note, List<RollHole>> notes;
 	
 	Roll(Track track) {
 		this.numRows = track.numKeys;
@@ -29,26 +29,29 @@ class Roll extends JPanel {
 	
 	void setMeasure(App app, Measure measure) {
 		removeAll();
-		this.notes = new HashMap<>();
+		notes = new HashMap<>();
+		// Map notes' values with corresponding GUI roll holes
 		measure.forEach(note -> notes.put(note, new ArrayList<>()));
-		// Build a row for each key
+		// Build a row for each piano key
 		for(int i = 0; i < numRows; i++) {
-			JPanel row = new JPanel();
-			row.setLayout(new BoxLayout(row, BoxLayout.LINE_AXIS));
-			// Row structure is that of the measure
-			for(int j = 0; j < measure.notesCount(); j++) {
-				// TODO refactor
-				RollValue rollNote = new RollValue(app, j, i, measure.note(j).length.logical());
-				if(measure.note(j).contains(i)) {
-					rollNote.setSelected(true);
-					notes.get(measure.note(j)).add(rollNote);
-				}
-				row.add(rollNote);
-				notes.putIfAbsent(measure.note(j), new ArrayList<>());
-			}
-			add(row, 0);
+			add(buildRow(app, measure, i), 0);
 		}
 		revalidate();
+	}
+	
+	private JPanel buildRow(App app, Measure measure, int rowInd) {
+		JPanel row = new JPanel();
+		row.setLayout(new BoxLayout(row, BoxLayout.LINE_AXIS));
+		// Each row has the structure of the notes in the measure
+		for(int noteInd = 0; noteInd < measure.notesCount(); noteInd++) {
+			RollHole hole = new RollHole(app, noteInd, rowInd, measure.note(noteInd).length);
+			if(measure.note(noteInd).contains(rowInd)) {
+				hole.setSelected(true);
+				notes.get(measure.note(noteInd)).add(hole);
+			}
+			row.add(hole);
+		}
+		return row;
 	}
 
 	void setProgress(Note note, double progress) {

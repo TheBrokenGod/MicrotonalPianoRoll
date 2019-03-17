@@ -34,6 +34,10 @@ public class NoteLength {
 		return 240.0 / measure.getBPM() / NAME_TO_INV_LEN.get(name);
 	}
 	
+	public static int inverse(String name) {
+		return NAME_TO_INV_LEN.get(name);
+	}
+	
 	public String name() {
 		return name;
 	}

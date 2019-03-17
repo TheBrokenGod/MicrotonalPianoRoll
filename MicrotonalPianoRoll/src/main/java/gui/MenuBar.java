@@ -39,7 +39,7 @@ class MenuBar extends JMenuBar {
 	
 	void setMeasure(int measure) {
 		this.measure.setText("Measure " + (measure + 1) + " of " + track.measuresCount() + " ");
-		// Keep resolution selection consistent with the last note of the measure
+		// Keep resolution selection consistent with last note of measure
 		Enumeration<AbstractButton> buttons = group.getElements();
 		while(buttons.hasMoreElements()) {
 			AbstractButton res = buttons.nextElement();
