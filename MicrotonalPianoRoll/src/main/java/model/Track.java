@@ -5,22 +5,28 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Track implements Iterable<Measure> {
-
-	private final double coefficient;
-	private final double lowestFrequency;
-	private final List<Measure> measures = new ArrayList<Measure>();
+	
+	public final double lowerFrequency;
+	public final double higherFrequency;
+	public final int stepsInBetween;
+	public final int lowestOffset;
 	public final int numKeys;
+	private final double coefficient;
+	private final List<Measure> measures = new ArrayList<Measure>();
 
-	public Track(double lowerFrequency, double higherFrequency, int stepsInBetween, int lowestOffsetFromLower, int keysCount) {
-		numKeys = keysCount;
+	public Track(double lowerFrequency, double higherFrequency, int stepsInBetween, int lowestOffset, int numKeys) {
+		this.lowerFrequency = lowerFrequency;
+		this.higherFrequency = higherFrequency;
+		this.stepsInBetween = stepsInBetween;
+		this.lowestOffset = lowestOffset;
+		this.numKeys = numKeys;
 		// Compute the coefficient needed to move in the frequencies table
 		coefficient = Math.pow(higherFrequency / lowerFrequency, 1.0 / stepsInBetween);
-		// Start at the specified position from lower frequency
-		lowestFrequency = lowerFrequency * Math.pow(coefficient, lowestOffsetFromLower);
 	}
 	
 	public double calcFrequencyAt(int noteIndex) {
-		return lowestFrequency * Math.pow(coefficient, noteIndex);
+		// The index is shifted by the offset specified during construction
+		return lowerFrequency * Math.pow(coefficient, lowestOffset + noteIndex);
 	}
 	
 	public Measure measure(int measure) {
@@ -53,5 +59,10 @@ public class Track implements Iterable<Measure> {
 	@Override
 	public Iterator<Measure> iterator() {
 		return measures.iterator();
+	}
+	
+	public void copyTo(Track track) {
+		track.measures.clear();
+		track.measures.addAll(measures);
 	}
 }

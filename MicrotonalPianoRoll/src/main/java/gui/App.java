@@ -60,8 +60,25 @@ public class App extends JFrame {
 	}
 	
 	void newFile() {
-		Track track = new Track(440, 880, 12, 0, 12);
+		new AudioDialog(this, new Track(440, 880, 12, 0, 12), this::doNewFile);
+		setTrack(track);
+	}
+	
+	void openFile() {
+		System.err.println("JFileChooser");
+	}
+	
+	void doNewFile(Track track) {
 		track.add(new Measure(60, bar.getResolution()));
+		setTrack(track);		
+	}
+	
+	void setAudio() {
+		new AudioDialog(this, this.track, this::doSetAudio);
+	}
+	
+	void doSetAudio(Track track) {
+		this.track.copyTo(track);
 		setTrack(track);
 	}
 	

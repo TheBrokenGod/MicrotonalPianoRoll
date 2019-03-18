@@ -33,4 +33,8 @@ public class Const {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	static String format(double value) {
+		return String.format("%.3f", value);
+	}
 }

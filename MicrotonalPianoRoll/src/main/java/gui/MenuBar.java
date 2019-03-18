@@ -58,11 +58,11 @@ class MenuBar extends JMenuBar {
 		JMenu menu, sub;
 		add(menu = new JMenu("Track"));
 		menu.add(buildMenuItem("New", app::newFile, KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
-		menu.add(buildMenuItem("Open", null, KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("Open", app::openFile, KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Save", null, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Save as", null, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
 		menu.addSeparator();
-		menu.add(buildMenuItem("Set audio", null, KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("Set audio", app::setAudio, KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Play", app::startOrStop, KeyEvent.VK_SPACE, 0));
 		menu.addSeparator();
 		menu.add(buildMenuItem("Exit", null, null, null));		
