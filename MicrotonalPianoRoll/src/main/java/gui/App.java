@@ -1,13 +1,19 @@
 package gui;
 
 import java.awt.Dimension;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.xml.sax.SAXException;
 
 import com.jsyn.unitgen.SawtoothOscillator;
 
@@ -15,6 +21,7 @@ import main.Synth;
 import model.Measure;
 import model.Note;
 import model.NoteLength;
+import model.SongReader;
 import model.Track;
 
 public class App extends JFrame {
@@ -22,12 +29,13 @@ public class App extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	Track track;
-	MenuBar bar;
+	Menu bar;
 	Piano piano;
 	Synth synth;
 	Roll roll;
 	private Player player;
 	private int measure;
+	private File current;
 
 	public App(Track track) {
 		JPanel root = new JPanel();
@@ -35,6 +43,7 @@ public class App extends JFrame {
 		setContentPane(root);		
 		setTrack(track);
 		player = new Player(this);
+		current = null;
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
@@ -47,7 +56,7 @@ public class App extends JFrame {
 		}
 		this.track = track;
 		setTitle("Microtonal Piano Roll :: " + track.toString());
-		setJMenuBar(bar = new MenuBar(this, track));
+		setJMenuBar(bar = new Menu(this, track));
 		synth = new Synth(track, SawtoothOscillator.class);
 		addKeyListener(piano = new Piano(synth, track.numKeys));
 		roll = new Roll(track);
@@ -60,24 +69,48 @@ public class App extends JFrame {
 	}
 	
 	void newFile() {
-		new AudioDialog(this, new Track(440, 880, 12, 0, 12), this::doNewFile);
-		setTrack(track);
-	}
-	
-	void openFile() {
-		System.err.println("JFileChooser");
+		new AudioDialog(this, Const.DEFAULT_TRACK, this::doNewFile);
 	}
 	
 	void doNewFile(Track track) {
-		track.add(new Measure(60, bar.getResolution()));
-		setTrack(track);		
+		// Add a first empty measure
+		track.add(new Measure(Const.DEFAULT_BPM, bar.getResolution()));
+		setTrack(track);
+	}
+
+	void openFile() {
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileFilter(new FileNameExtensionFilter("XML file (Microtonal Piano Roll)", "xml"));
+		if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+			File file = chooser.getSelectedFile();
+			try {
+				setTrack(new SongReader(file).read());
+			}
+			catch (SAXException e) {
+				JOptionPane.showMessageDialog(this, "Not a valid file", file.getName(), JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+	
+	void saveFile() {
+		if(current == null) {
+			saveFileAs();
+		}
+	}
+	
+	void saveFileAs() {
+		current = null;
 	}
 	
 	void setAudio() {
 		new AudioDialog(this, this.track, this::doSetAudio);
 	}
 	
+	void setOscillator() {
+	}
+	
 	void doSetAudio(Track track) {
+		// Keep previous notes
 		this.track.copyTo(track);
 		setTrack(track);
 	}

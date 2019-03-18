@@ -10,8 +10,13 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 
+import model.Track;
+
 public class Const {
 
+	static final Track DEFAULT_TRACK = new Track(440, 880, 12, -12, 12);
+	static final int DEFAULT_BPM = 60;
+	
 	static final Dimension KEY_SIZE = new Dimension(125, 38);
 	static final int BORDER_THICKNESS = 1;
 	static final Border KEY_BORDER = BorderFactory.createLineBorder(Color.DARK_GRAY, BORDER_THICKNESS);

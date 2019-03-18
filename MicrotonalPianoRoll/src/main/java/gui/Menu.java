@@ -17,7 +17,7 @@ import javax.swing.SwingConstants;
 
 import model.Track;
 
-class MenuBar extends JMenuBar {
+class Menu extends JMenuBar {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -26,7 +26,7 @@ class MenuBar extends JMenuBar {
 	private final JLabel measure;
 	private final ButtonGroup group;
 	
-	MenuBar(App app, Track track) {
+	Menu(App app, Track track) {
 		this.app = app;
 		this.track = track;
 		group = new ButtonGroup();
@@ -39,7 +39,7 @@ class MenuBar extends JMenuBar {
 	
 	void setMeasure(int measure) {
 		this.measure.setText("Measure " + (measure + 1) + " of " + track.measuresCount() + " ");
-		// Keep resolution selection consistent with last note of measure
+		// Keep resolution radio consistent with the last note in the measure
 		Enumeration<AbstractButton> buttons = group.getElements();
 		while(buttons.hasMoreElements()) {
 			AbstractButton res = buttons.nextElement();
@@ -59,13 +59,14 @@ class MenuBar extends JMenuBar {
 		add(menu = new JMenu("Track"));
 		menu.add(buildMenuItem("New", app::newFile, KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Open", app::openFile, KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
-		menu.add(buildMenuItem("Save", null, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
-		menu.add(buildMenuItem("Save as", null, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
+		menu.add(buildMenuItem("Save", app::saveFile, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("Save as", app::saveFileAs, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
 		menu.addSeparator();
 		menu.add(buildMenuItem("Set audio", app::setAudio, KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("Set oscillator", app::setOscillator, KeyEvent.VK_G, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Play", app::startOrStop, KeyEvent.VK_SPACE, 0));
 		menu.addSeparator();
-		menu.add(buildMenuItem("Exit", null, null, null));		
+		menu.add(buildMenuItem("Exit", () -> System.exit(0), KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK));		
 		add(menu = new JMenu("Navigation"));
 		menu.add(sub = new JMenu("Measure"));
 		sub.add(buildMenuItem("Previous", app::previousMeasure, KeyEvent.VK_LEFT, 0));
