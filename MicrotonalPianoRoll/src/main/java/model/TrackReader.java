@@ -14,12 +14,12 @@ import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmValue;
 
-public class SongReader {
+public class TrackReader {
 
 	private XPathCompiler xpath;
 	private XdmItem document;
 	
-	public SongReader(File file) throws SAXException {
+	public TrackReader(File file) throws SAXException {
 		Processor proc = new Processor(new Configuration());
 		xpath = proc.newXPathCompiler();
 		try {

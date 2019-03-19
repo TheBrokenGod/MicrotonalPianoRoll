@@ -53,7 +53,7 @@ class AudioDialog extends JDialog implements ActionListener, KeyListener {
 		labels.add(new JLabel("Number of keys"));
 		inputs.add(keys = new JTextField(Integer.toString(initial.numKeys)));
 		panel.add(labels);
-		panel.add(Box.createRigidArea(new Dimension(10, 1)));
+		panel.add(Box.createRigidArea(new Dimension(20, 1)));
 		panel.add(inputs);
 		lower.addKeyListener(this);
 		higher.addKeyListener(this);

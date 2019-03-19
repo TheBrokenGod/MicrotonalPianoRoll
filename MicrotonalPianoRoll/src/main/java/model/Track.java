@@ -52,6 +52,14 @@ public class Track implements Iterable<Measure> {
 		measures.add(measure);
 	}
 
+	public void insert(int index, Measure measure) {
+		measures.add(index, measure);
+	}
+	
+	public void remove(int index) {
+		measures.remove(index);
+	}
+
 	public int measuresCount() {
 		return measures.size();
 	}

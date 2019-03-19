@@ -37,8 +37,8 @@ class Menu extends JMenuBar {
 		add(panel);
 	}
 	
-	void setMeasure(int measure) {
-		this.measure.setText("Measure " + (measure + 1) + " of " + track.measuresCount() + " ");
+	void setMeasure(int measure, boolean tempoChange) {
+		this.measure.setText("Measure " + (measure + 1) + (tempoChange ? "*" : "") + " of " + track.measuresCount() + " ");
 		// Keep resolution radio consistent with the last note in the measure
 		Enumeration<AbstractButton> buttons = group.getElements();
 		while(buttons.hasMoreElements()) {
@@ -62,23 +62,23 @@ class Menu extends JMenuBar {
 		menu.add(buildMenuItem("Save", app::saveFile, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Save as", app::saveFileAs, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
 		menu.addSeparator();
-		menu.add(buildMenuItem("Set audio", app::setAudio, KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
-		menu.add(buildMenuItem("Set oscillator", app::setOscillator, KeyEvent.VK_G, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("Audio properties", app::setAudio, KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("Unit oscillator", app::setOscillator, KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Play", app::startOrStop, KeyEvent.VK_SPACE, 0));
 		menu.addSeparator();
 		menu.add(buildMenuItem("Exit", () -> System.exit(0), KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK));		
 		add(menu = new JMenu("Navigation"));
 		menu.add(sub = new JMenu("Measure"));
 		sub.add(buildMenuItem("Previous", app::previousMeasure, KeyEvent.VK_LEFT, 0));
-		sub.add(buildMenuItem("Next", app::nextMeasure, KeyEvent.VK_RIGHT, 0));
+		sub.add(buildMenuItem("Next / New", app::nextMeasure, KeyEvent.VK_RIGHT, 0));
 		sub.addSeparator();
 		sub.add(buildMenuItem("First", app::firstMeasure, KeyEvent.VK_HOME, 0));
 		sub.add(buildMenuItem("Last", app::lastMeasure, KeyEvent.VK_END, 0));
 		sub.addSeparator();
-		sub.add(buildMenuItem("By index", null, KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("By index", app::byIndex, KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(sub = new JMenu("Tempo change"));
-		sub.add(buildMenuItem("Previous", null, KeyEvent.VK_LEFT, KeyEvent.CTRL_DOWN_MASK));
-		sub.add(buildMenuItem("Next", null, KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("Previous", app::previousTempo, KeyEvent.VK_LEFT, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("Next", app::nextTempo, KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK));
 		add(menu = new JMenu("Composition"));
 		menu.add(sub = new JMenu("Resolution"));
 		sub.add(buildRadioItem(app, "1", group));
@@ -97,11 +97,11 @@ class Menu extends JMenuBar {
 		sub.add(buildMenuItem("Increase", null, KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK));
 		sub.add(buildMenuItem("Decrease", null, KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(sub = new JMenu("Measure"));
-		sub.add(buildMenuItem("Insert", null, KeyEvent.VK_INSERT, null));
-		sub.add(buildMenuItem("Delete", null, KeyEvent.VK_DELETE, null));
+		sub.add(buildMenuItem("Insert", app::insertMeasure, KeyEvent.VK_INSERT, null));
+		sub.add(buildMenuItem("Delete", app::deleteMeasure, KeyEvent.VK_DELETE, null));
 		menu.add(sub = new JMenu("Tempo change"));
-		sub.add(buildMenuItem("Set", null, KeyEvent.VK_INSERT, KeyEvent.CTRL_DOWN_MASK));
-		sub.add(buildMenuItem("Clear", null, KeyEvent.VK_DELETE, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("Set", app::setTempoChange, KeyEvent.VK_INSERT, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("Clear", app::clearTempoChange, KeyEvent.VK_DELETE, KeyEvent.CTRL_DOWN_MASK));
 		add(menu = new JMenu("About"));
 		menu.add(buildMenuItem("Info", null, null, null));
 	}

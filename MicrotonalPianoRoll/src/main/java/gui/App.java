@@ -11,18 +11,15 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.xml.sax.SAXException;
-
-import com.jsyn.unitgen.SawtoothOscillator;
 
 import main.Synth;
 import model.Measure;
 import model.Note;
 import model.NoteLength;
-import model.SongReader;
 import model.Track;
+import model.TrackReader;
 
 public class App extends JFrame {
 
@@ -35,7 +32,7 @@ public class App extends JFrame {
 	Roll roll;
 	private Player player;
 	private int measure;
-	private File current;
+	private File file;
 
 	public App(Track track) {
 		JPanel root = new JPanel();
@@ -43,7 +40,7 @@ public class App extends JFrame {
 		setContentPane(root);		
 		setTrack(track);
 		player = new Player(this);
-		current = null;
+		file = null;
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
@@ -57,15 +54,29 @@ public class App extends JFrame {
 		this.track = track;
 		setTitle("Microtonal Piano Roll :: " + track.toString());
 		setJMenuBar(bar = new Menu(this, track));
-		synth = new Synth(track, SawtoothOscillator.class);
-		addKeyListener(piano = new Piano(synth, track.numKeys));
+		synth = new Synth(track, synth != null ? synth.oscillator() : Synth.defaultOscillator());
+		piano = new Piano(synth, track.numKeys);
 		roll = new Roll(track);
+		addKeyListener(piano);
 		getContentPane().removeAll();
 		getContentPane().add(piano);
 		getContentPane().add(Box.createRigidArea(new Dimension(10, 1)));
 		getContentPane().add(roll);
 		setMeasure(0);
 		pack();
+	}
+	
+	void setInteractive(boolean interactive) {
+		// TODO call everywhere
+		if(interactive) {
+			if(player.isPlaying()) {
+				player.stop();
+			}
+			addKeyListener(piano);
+		}
+		else {
+			removeKeyListener(piano);
+		}
 	}
 	
 	void newFile() {
@@ -80,11 +91,11 @@ public class App extends JFrame {
 
 	void openFile() {
 		JFileChooser chooser = new JFileChooser();
-		chooser.setFileFilter(new FileNameExtensionFilter("XML file (Microtonal Piano Roll)", "xml"));
+		chooser.setFileFilter(Const.FILE_TYPE_FILTER);
 		if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			File file = chooser.getSelectedFile();
 			try {
-				setTrack(new SongReader(file).read());
+				setTrack(new TrackReader(file).read());
 			}
 			catch (SAXException e) {
 				JOptionPane.showMessageDialog(this, "Not a valid file", file.getName(), JOptionPane.ERROR_MESSAGE);
@@ -93,26 +104,55 @@ public class App extends JFrame {
 	}
 	
 	void saveFile() {
-		if(current == null) {
+		if(file == null) {
 			saveFileAs();
+		}
+		else {
+			
 		}
 	}
 	
 	void saveFileAs() {
-		current = null;
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileFilter(Const.FILE_TYPE_FILTER);
+		if(chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+			file = chooser.getSelectedFile();
+			if(!file.toString().endsWith(".xml")) {
+				file = new File(file.toString() + ".xml");
+			}
+			saveFile();
+		}
 	}
 	
 	void setAudio() {
 		new AudioDialog(this, this.track, this::doSetAudio);
 	}
 	
-	void setOscillator() {
-	}
-	
 	void doSetAudio(Track track) {
+		int highest = 0;
+		// Check if enough keys to play
+		for(Measure measure : this.track) {
+			for(Note note : measure) {
+				for(int value : note) {
+					highest = Math.max(highest, value);
+				}
+			}
+		}
+		if(track.numKeys < highest + 1) {
+			JOptionPane.showMessageDialog(this, "This track requires " + (highest + 1) + " keys", "", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		// Keep previous notes
 		this.track.copyTo(track);
 		setTrack(track);
+	}
+	
+	void setOscillator() {
+		String value = (String) JOptionPane.showInputDialog(this, "Please select the unit oscillator", null, JOptionPane.QUESTION_MESSAGE, null, Synth.availableOscillators(), synth.oscillator());
+		if(value != null) {
+			synth.dispose();
+			synth = new Synth(track, value);
+		}
 	}
 	
 	void startOrStop() {
@@ -121,18 +161,6 @@ public class App extends JFrame {
 		}
 		else {
 			player.start();
-		}
-	}
-	
-	void setInteractive(boolean isInteractive) {
-		if(isInteractive) {
-			if(player.isPlaying()) {
-				player.stop();
-			}
-			addKeyListener(piano);
-		}
-		else {
-			removeKeyListener(piano);
 		}
 	}
 	
@@ -165,10 +193,84 @@ public class App extends JFrame {
 		setMeasure(track.measuresCount() - 1);
 	}
 	
+	void byIndex() {
+		String input = JOptionPane.showInputDialog(this, "Please insert measure index", Integer.toString(measure + 1));
+		try {
+			int index = Integer.parseInt(input) - 1;
+			if(index >= 0 && index < track.measuresCount()) {
+				setMeasure(index);
+			}
+		}
+		catch(NumberFormatException e) {
+		}
+	}
+	
+	void previousTempo() {
+		if(measure == 0) {
+			return;
+		}
+		int bpm = track.measure(measure - 1).getBPM();
+		int measure = this.measure - 1;
+		// Move at the beginning of the tempo group of the previous measure 
+		for (int i = measure - 1; i >= 0 && track.measure(i).getBPM() == bpm; i--) {
+			measure = i;
+		}
+		setMeasure(measure);
+	}
+	
+	void nextTempo() {
+		for (int i = measure; i < track.measuresCount(); i++) {
+			if(track.measure(i).getBPM() != track.measure(measure).getBPM()) {
+				setMeasure(i);
+				break;
+			}
+		}
+	}
+	
+	void insertMeasure() {
+		track.insert(measure, new Measure(track.measure(measure).getBPM(), bar.getResolution()));
+		setMeasure(measure);
+	}
+	
+	void deleteMeasure() {
+		if(track.measuresCount() == 1) {
+			return;
+		}
+		track.remove(measure);
+		setMeasure(Math.min(measure, track.measuresCount() - 1));
+	}
+	
+	void setTempoChange() {
+		String input = JOptionPane.showInputDialog(this, "Please insert new tempo", track.measure(measure).getBPM());
+		try {
+			int bpm = Integer.parseInt(input);
+			if(bpm > 0) {
+				int old = track.measure(measure).getBPM();
+				for (int i = measure; i < track.measuresCount() && track.measure(i).getBPM() == old; i++) {
+					track.measure(i).setBPM(bpm);					
+				}
+				setMeasure(measure);
+			}
+		}
+		catch(NumberFormatException e) {
+		}
+	}
+	
+	void clearTempoChange() {
+		if(measure == 0) {
+			return;
+		}
+		int old = track.measure(measure).getBPM();
+		for (int i = measure; i < track.measuresCount() && track.measure(i).getBPM() == old; i++) {
+			track.measure(i).setBPM(track.measure(i - 1).getBPM());			
+		}
+		setMeasure(measure);
+	}
+	
 	void setMeasure(int measure) {
 		this.measure = measure;
 		roll.setMeasure(this, track.measure(measure));
-		bar.setMeasure(measure);
+		bar.setMeasure(measure, measure == 0 || track.measure(measure).getBPM() != track.measure(measure - 1).getBPM());
 	}
 	
 	// TODO rework from scratch
