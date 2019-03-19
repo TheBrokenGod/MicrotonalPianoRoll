@@ -3,6 +3,7 @@ package gui;
 import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -15,6 +16,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
+import model.NoteLength;
 import model.Track;
 
 class Menu extends JMenuBar {
@@ -39,15 +41,19 @@ class Menu extends JMenuBar {
 	
 	void setMeasure(int measure, boolean tempoChange) {
 		this.measure.setText("Measure " + (measure + 1) + (tempoChange ? "*" : "") + " of " + track.measuresCount() + " ");
-		// Keep resolution radio consistent with the last note in the measure
+		// Keep resolution menu radio selection consistent with the last note in the measure
+		getResolutionRadio(track.measure(measure).lastNote().length.name()).setSelected(true);
+	}
+	
+	private AbstractButton getResolutionRadio(String resolution) {
 		Enumeration<AbstractButton> buttons = group.getElements();
 		while(buttons.hasMoreElements()) {
-			AbstractButton res = buttons.nextElement();
-			if(res.getText().equals(track.measure(measure).lastNote().length.name())) {
-				res.setSelected(true);
-				break;
+			AbstractButton button = buttons.nextElement();
+			if(button.getText().equals(resolution)) {
+				return button;
 			}
 		}
+		return null;
 	}
 	
 	String getResolution() {
@@ -69,11 +75,11 @@ class Menu extends JMenuBar {
 		menu.add(buildMenuItem("Exit", () -> System.exit(0), KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK));		
 		add(menu = new JMenu("Navigation"));
 		menu.add(sub = new JMenu("Measure"));
-		sub.add(buildMenuItem("Previous", app::previousMeasure, KeyEvent.VK_LEFT, 0));
-		sub.add(buildMenuItem("Next / New", app::nextMeasure, KeyEvent.VK_RIGHT, 0));
+		sub.add(buildMenuItem("Previous", app::previousMeasure, KeyEvent.VK_LEFT, null));
+		sub.add(buildMenuItem("Next / New", app::nextMeasure, KeyEvent.VK_RIGHT, null));
 		sub.addSeparator();
-		sub.add(buildMenuItem("First", app::firstMeasure, KeyEvent.VK_HOME, 0));
-		sub.add(buildMenuItem("Last", app::lastMeasure, KeyEvent.VK_END, 0));
+		sub.add(buildMenuItem("First", app::firstMeasure, KeyEvent.VK_HOME, null));
+		sub.add(buildMenuItem("Last", app::lastMeasure, KeyEvent.VK_END, null));
 		sub.addSeparator();
 		sub.add(buildMenuItem("By index", app::byIndex, KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(sub = new JMenu("Tempo change"));
@@ -81,21 +87,16 @@ class Menu extends JMenuBar {
 		sub.add(buildMenuItem("Next", app::nextTempo, KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK));
 		add(menu = new JMenu("Composition"));
 		menu.add(sub = new JMenu("Resolution"));
-		sub.add(buildRadioItem(app, "1", group));
-		sub.add(buildRadioItem(app, "2", group));
-		sub.add(buildRadioItem(app, "4", group));
-		sub.add(buildRadioItem(app, "8", group));
-		sub.add(buildRadioItem(app, "16", group));
-		sub.add(buildRadioItem(app, "32", group));
+		for(String note : NoteLength.NAMES_NORMAL) {
+			sub.add(buildRadioItem(app, note, group));			
+		}
 		sub.addSeparator();
-		sub.add(buildRadioItem(app, "2T", group));
-		sub.add(buildRadioItem(app, "4T", group));
-		sub.add(buildRadioItem(app, "8T", group));
-		sub.add(buildRadioItem(app, "16T", group));
-		sub.add(buildRadioItem(app, "32T", group));
+		for(String note : NoteLength.NAMES_THIRD) {
+			sub.add(buildRadioItem(app, note, group));			
+		}
 		sub.addSeparator();
-		sub.add(buildMenuItem("Increase", null, KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK));
-		sub.add(buildMenuItem("Decrease", null, KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("Increase", this::increaseResolution, KeyEvent.VK_UP, null));
+		sub.add(buildMenuItem("Decrease", this::decreaseResolution, KeyEvent.VK_DOWN, null));
 		menu.add(sub = new JMenu("Measure"));
 		sub.add(buildMenuItem("Insert", app::insertMeasure, KeyEvent.VK_INSERT, null));
 		sub.add(buildMenuItem("Delete", app::deleteMeasure, KeyEvent.VK_DELETE, null));
@@ -121,7 +122,30 @@ class Menu extends JMenuBar {
 		JRadioButtonMenuItem radio = new JRadioButtonMenuItem(text);
 		radio.getModel().setActionCommand(text);
 		group.add(radio);
-		radio.addActionListener(e -> app.resolutionChanged());
+		radio.addActionListener(e -> app.resolutionChanged(e.getActionCommand()));
 		return radio;
+	}
+	
+	private void increaseResolution() {
+		changeResolution(+1);
+	}
+	
+	private void decreaseResolution() {
+		changeResolution(-1);
+	}
+	
+	private void changeResolution(int offset) {
+		List<String> notes;
+		if(NoteLength.NAMES_NORMAL.contains(getResolution())) {
+			notes = NoteLength.NAMES_NORMAL;
+		}
+		else {
+			notes = NoteLength.NAMES_THIRD;
+		}
+		int index = notes.indexOf(getResolution()) + offset;
+		if(index < 0 || index >= notes.size()) {
+			return;
+		}
+		getResolutionRadio(notes.get(index)).doClick();
 	}
 }

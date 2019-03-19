@@ -274,7 +274,7 @@ public class App extends JFrame {
 	}
 	
 	// TODO rework from scratch
-	void resolutionChanged() {
+	void resolutionChanged(String resolution) {
 		Measure measure = track.measure(this.measure);
 		// Remove empty notes at the end of the measure
 		List<Note> removed = new ArrayList<>();
@@ -283,8 +283,8 @@ public class App extends JFrame {
 		}
 		if(removed.size() > 0) {
 			// Check if empty space can be filled with notes at new resolution
-			if(10 * NoteLength.inverse(bar.getResolution()) % (int)Math.round(10 / measure.freeSpace()) == 0) {
-				measure.fill(bar.getResolution());
+			if(10 * NoteLength.inverse(resolution) % (int)Math.round(10 / measure.freeSpace()) == 0) {
+				measure.fill(resolution);
 			}
 			else {
 				// Otherwise restore
@@ -303,7 +303,7 @@ public class App extends JFrame {
 			note.remove(value);
 			// May be the new rightmost empty note
 			if(note.isEmpty()) {
-				resolutionChanged();
+				resolutionChanged(bar.getResolution());
 			}
 		}
 	}
