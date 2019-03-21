@@ -27,6 +27,7 @@ public class Piano extends JPanel implements KeyListener {
 			add(keys[i], 0);
 		}
 		setPreferredSize(new Dimension(Const.KEY_SIZE.width, numKeys * Const.KEY_SIZE.height));
+		setMaximumSize(new Dimension(Const.KEY_SIZE.width, Integer.MAX_VALUE));
 	}
 	
 	void play(Note note) {

@@ -20,6 +20,7 @@ import model.Note;
 import model.NoteLength;
 import model.Track;
 import model.TrackReader;
+import model.TrackWriter;
 
 public class App extends JFrame {
 
@@ -30,8 +31,8 @@ public class App extends JFrame {
 	Piano piano;
 	Synth synth;
 	Roll roll;
+	int measure;
 	private Player player;
-	private int measure;
 	private File file;
 
 	public App(Track track) {
@@ -66,19 +67,6 @@ public class App extends JFrame {
 		pack();
 	}
 	
-	void setInteractive(boolean interactive) {
-		// TODO call everywhere
-		if(interactive) {
-			if(player.isPlaying()) {
-				player.stop();
-			}
-			addKeyListener(piano);
-		}
-		else {
-			removeKeyListener(piano);
-		}
-	}
-	
 	void newFile() {
 		new AudioDialog(this, Const.DEFAULT_TRACK, this::doNewFile);
 	}
@@ -108,7 +96,12 @@ public class App extends JFrame {
 			saveFileAs();
 		}
 		else {
-			
+			try {
+				new TrackWriter(file).write(track);
+			}
+			catch (SAXException e) {
+				JOptionPane.showMessageDialog(this, "Error saving track", file.getName(), JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 	
@@ -156,27 +149,36 @@ public class App extends JFrame {
 	}
 	
 	void startOrStop() {
-		if(player.isPlaying()) {
-			player.stop();
-		}
-		else {
-			player.start();
+		if(!stopIfPlaying()) {
+			start();
 		}
 	}
 	
+	void start() {
+		removeKeyListener(piano);
+		player.start();
+	}
+	
+	boolean stopIfPlaying() {
+		if(player.isPlaying()) {
+			player.stop();
+			addKeyListener(piano);
+			return true;
+		}
+		return false;
+	}
+	
 	void previousMeasure() {
-		setInteractive(true);
 		if(measure > 0) {
 			setMeasure(measure - 1);
 		}
 	}
 	
-	int currentMeasure() {
-		return measure;
+	Measure currentMeasure() {
+		return track.measure(measure);
 	}
 	
 	void nextMeasure() {
-		setInteractive(true);
 		if(measure == track.measuresCount() - 1) {
 			track.add(new Measure(track.lastMeasure().getBPM(), bar.getResolution()));
 		}
@@ -184,12 +186,10 @@ public class App extends JFrame {
 	}
 	
 	void firstMeasure() {
-		setInteractive(true);
 		setMeasure(0);
 	}
 	
 	void lastMeasure() {
-		setInteractive(true);
 		setMeasure(track.measuresCount() - 1);
 	}
 	
@@ -209,8 +209,8 @@ public class App extends JFrame {
 		if(measure == 0) {
 			return;
 		}
-		int bpm = track.measure(measure - 1).getBPM();
 		int measure = this.measure - 1;
+		int bpm = currentMeasure().getBPM();
 		// Move at the beginning of the tempo group of the previous measure 
 		for (int i = measure - 1; i >= 0 && track.measure(i).getBPM() == bpm; i--) {
 			measure = i;
@@ -219,8 +219,9 @@ public class App extends JFrame {
 	}
 	
 	void nextTempo() {
+		// Move at the first measure where the tempo changes
 		for (int i = measure; i < track.measuresCount(); i++) {
-			if(track.measure(i).getBPM() != track.measure(measure).getBPM()) {
+			if(track.measure(i).getBPM() != currentMeasure().getBPM()) {
 				setMeasure(i);
 				break;
 			}
@@ -228,7 +229,7 @@ public class App extends JFrame {
 	}
 	
 	void insertMeasure() {
-		track.insert(measure, new Measure(track.measure(measure).getBPM(), bar.getResolution()));
+		track.insert(measure, new Measure(currentMeasure().getBPM(), bar.getResolution()));
 		setMeasure(measure);
 	}
 	
@@ -241,14 +242,16 @@ public class App extends JFrame {
 	}
 	
 	void setTempoChange() {
-		String input = JOptionPane.showInputDialog(this, "Please insert new tempo", track.measure(measure).getBPM());
+		String input = JOptionPane.showInputDialog(this, "Please insert new tempo", currentMeasure().getBPM());
 		try {
 			int bpm = Integer.parseInt(input);
 			if(bpm > 0) {
-				int old = track.measure(measure).getBPM();
+				int old = currentMeasure().getBPM();
+				// Set new value on all measures sharing the same BPM, starting from current position
 				for (int i = measure; i < track.measuresCount() && track.measure(i).getBPM() == old; i++) {
 					track.measure(i).setBPM(bpm);					
 				}
+				// Update bar text
 				setMeasure(measure);
 			}
 		}
@@ -260,7 +263,8 @@ public class App extends JFrame {
 		if(measure == 0) {
 			return;
 		}
-		int old = track.measure(measure).getBPM();
+		int old = currentMeasure().getBPM();
+		// Undo tempo change on all measures previously affected by setTempoChange
 		for (int i = measure; i < track.measuresCount() && track.measure(i).getBPM() == old; i++) {
 			track.measure(i).setBPM(track.measure(i - 1).getBPM());			
 		}
@@ -269,8 +273,8 @@ public class App extends JFrame {
 	
 	void setMeasure(int measure) {
 		this.measure = measure;
-		roll.setMeasure(this, track.measure(measure));
-		bar.setMeasure(measure, measure == 0 || track.measure(measure).getBPM() != track.measure(measure - 1).getBPM());
+		roll.setMeasure(this, currentMeasure());
+		bar.setMeasure(measure, measure == 0 || currentMeasure().getBPM() != track.measure(measure - 1).getBPM());
 	}
 	
 	// TODO rework from scratch
@@ -293,9 +297,14 @@ public class App extends JFrame {
 		}
 		setMeasure(this.measure);	
 	}
+	
+	void showInfoDialog() {
+		// TODO implement
+	}
 
-	public void noteChanged(int i, int value, boolean selected) {
-		Note note = track.measure(measure).note(i);
+	void noteChanged(int i, int value, boolean selected) {
+		stopIfPlaying();
+		Note note = currentMeasure().note(i);
 		if(selected) {
 			note.add(value);
 		}

@@ -48,7 +48,7 @@ class Player {
 		double time = this.startTime;
 		try {
 			// Resume playing at the current measure
-			for(int i = app.currentMeasure(); i < app.track.measuresCount(); i++) {
+			for(int i = app.measure; i < app.track.measuresCount(); i++) {
 				for(Note note : app.track.measure(i)) {
 					app.synth.play(note);
 					app.synth.sleepUntil(time += note.length.absolute());
@@ -66,8 +66,7 @@ class Player {
 		double time = this.startTime;
 		try {
 			// Disable piano input during playback
-			SwingUtilities.invokeAndWait(() -> app.setInteractive(false));
-			for(int i = app.currentMeasure(); i < app.track.measuresCount(); i++) {
+			for(int i = app.measure; i < app.track.measuresCount(); i++) {
 				for(Note note : app.track.measure(i)) {
 					// Show played keys as pressed
 					SwingUtilities.invokeAndWait(() -> app.piano.play(note));
@@ -80,7 +79,7 @@ class Player {
 		finally {
 			SwingUtilities.invokeLater(() -> {
 				app.piano.stop();
-				app.setInteractive(true);
+				app.stopIfPlaying();
 			});
 		}
 	}
@@ -88,7 +87,7 @@ class Player {
 	private void roll() {
 		double time = this.startTime;
 		try {
-			for(int i = app.currentMeasure(); i < app.track.measuresCount(); i++) {
+			for(int i = app.measure; i < app.track.measuresCount(); i++) {
 				Integer measure = i;
 				// Rebuild roll with current measure
 				SwingUtilities.invokeAndWait(() -> {

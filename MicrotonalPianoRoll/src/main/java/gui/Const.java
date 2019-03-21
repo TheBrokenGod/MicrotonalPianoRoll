@@ -20,13 +20,13 @@ public class Const {
 	static final int DEFAULT_BPM = 60;
 	
 	static final FileFilter FILE_TYPE_FILTER = new FileNameExtensionFilter("Microtonal Piano Roll XML file", "xml");
-	static final Dimension KEY_SIZE = new Dimension(125, 38);
+	static final Dimension KEY_SIZE = new Dimension(128, 36);
 	static final int BORDER_THICKNESS = 1;
 	static final Border KEY_BORDER = BorderFactory.createLineBorder(Color.DARK_GRAY, BORDER_THICKNESS);
 	static final Color KEY_COLOR = Color.WHITE;
 	static final Color KEY_HELD_COLOR = KEY_COLOR.darker();
 	
-	static final Dimension ROLL_SIZE = new Dimension(4 * KEY_SIZE.width, KEY_SIZE.height);
+	static final Dimension ROLL_SIZE = new Dimension(4 * 192, KEY_SIZE.height);
 	static final Border HOLE_BORDER = BorderFactory.createLineBorder(Color.GRAY, BORDER_THICKNESS);
 	static final Color ROLLNOTE_COLOR_EVEN = new Color(0xEE, 0xEE, 0xEE);
 	static final Color ROLLNOTE_COLOR_ODD = Color.WHITE;

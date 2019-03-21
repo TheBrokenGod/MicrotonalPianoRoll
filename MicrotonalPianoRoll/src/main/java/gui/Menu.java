@@ -70,7 +70,10 @@ class Menu extends JMenuBar {
 		menu.addSeparator();
 		menu.add(buildMenuItem("Audio properties", app::setAudio, KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Unit oscillator", app::setOscillator, KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK));
-		menu.add(buildMenuItem("Play", app::startOrStop, KeyEvent.VK_SPACE, 0));
+		JMenuItem item = new JMenuItem("Play");
+		item.addActionListener(e -> app.startOrStop());
+		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
+		menu.add(item);
 		menu.addSeparator();
 		menu.add(buildMenuItem("Exit", () -> System.exit(0), KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK));		
 		add(menu = new JMenu("Navigation"));
@@ -104,14 +107,15 @@ class Menu extends JMenuBar {
 		sub.add(buildMenuItem("Set", app::setTempoChange, KeyEvent.VK_INSERT, KeyEvent.CTRL_DOWN_MASK));
 		sub.add(buildMenuItem("Clear", app::clearTempoChange, KeyEvent.VK_DELETE, KeyEvent.CTRL_DOWN_MASK));
 		add(menu = new JMenu("About"));
-		menu.add(buildMenuItem("Info", null, null, null));
+		menu.add(buildMenuItem("Info", app::showInfoDialog, null, null));
 	}
 	
-	private static JMenuItem buildMenuItem(String text, Runnable action, Integer keyCode, Integer modifiers) {
+	private JMenuItem buildMenuItem(String text, Runnable action, Integer keyCode, Integer modifiers) {
 		JMenuItem item = new JMenuItem(text);
-		if(action != null) {
-			item.addActionListener(e -> action.run());
-		}
+		item.addActionListener(e -> {
+			app.stopIfPlaying();
+			action.run();	
+		});
 		if(keyCode != null) {
 			item.setAccelerator(KeyStroke.getKeyStroke(keyCode, modifiers != null ? modifiers : 0));
 		}
@@ -122,7 +126,10 @@ class Menu extends JMenuBar {
 		JRadioButtonMenuItem radio = new JRadioButtonMenuItem(text);
 		radio.getModel().setActionCommand(text);
 		group.add(radio);
-		radio.addActionListener(e -> app.resolutionChanged(e.getActionCommand()));
+		radio.addActionListener(e -> {
+			app.stopIfPlaying();
+			app.resolutionChanged(e.getActionCommand());	
+		});
 		return radio;
 	}
 	
