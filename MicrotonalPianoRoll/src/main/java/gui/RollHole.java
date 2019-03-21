@@ -76,7 +76,12 @@ class RollHole extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			app.noteChanged(note, row, isSelected());
+			if(!app.player.isPlaying()) {
+				app.rollHoleChanged(note, row, isSelected());
+			}
+			else {
+				setSelected(!isSelected());
+			}
 		}
 	}
 }

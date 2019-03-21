@@ -89,13 +89,16 @@ class Menu extends JMenuBar {
 		sub.add(buildMenuItem("Previous", app::previousTempo, KeyEvent.VK_LEFT, KeyEvent.CTRL_DOWN_MASK));
 		sub.add(buildMenuItem("Next", app::nextTempo, KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK));
 		add(menu = new JMenu("Composition"));
+		menu.add(buildMenuItem("Write piano keys", app::writePianoKeysIntoRoll, KeyEvent.VK_ENTER, null));
+		menu.add(buildMenuItem("Release piano keys", app::releasePianoKeys, KeyEvent.VK_ESCAPE, null));
+		menu.addSeparator();
 		menu.add(sub = new JMenu("Resolution"));
 		for(String note : NoteLength.NAMES_NORMAL) {
 			sub.add(buildRadioItem(app, note, group));			
 		}
 		sub.addSeparator();
 		for(String note : NoteLength.NAMES_THIRD) {
-			sub.add(buildRadioItem(app, note, group));			
+			sub.add(buildRadioItem(app, note, group));
 		}
 		sub.addSeparator();
 		sub.add(buildMenuItem("Increase", this::increaseResolution, KeyEvent.VK_UP, null));

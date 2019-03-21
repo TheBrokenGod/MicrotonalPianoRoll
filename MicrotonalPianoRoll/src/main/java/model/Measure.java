@@ -48,6 +48,10 @@ public class Measure implements Iterable<Note> {
 		return notes.get(note);
 	}
 	
+	public Note firstEmptyNote() {
+		return notes.stream().filter(Note::isEmpty).findFirst().orElse(null);
+	}
+	
 	public int notesCount() {
 		return notes.size();
 	}

@@ -32,7 +32,7 @@ public class App extends JFrame {
 	Synth synth;
 	Roll roll;
 	int measure;
-	private Player player;
+	Player player;
 	private File file;
 
 	public App(Track track) {
@@ -46,19 +46,21 @@ public class App extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
 	}
+	
+	public App() {
+		this(Const.DEFAULT_TRACK);
+	}
 
-	void setTrack(Track track) {
+	public void setTrack(Track track) {
 		if(piano != null) {
-			removeKeyListener(piano);
 			synth.dispose();
 		}
 		this.track = track;
 		setTitle("Microtonal Piano Roll :: " + track.toString());
 		setJMenuBar(bar = new Menu(this, track));
 		synth = new Synth(track, synth != null ? synth.oscillator() : Synth.defaultOscillator());
-		piano = new Piano(synth, track.numKeys);
+		piano = new Piano(this, track.numKeys);
 		roll = new Roll(track);
-		addKeyListener(piano);
 		getContentPane().removeAll();
 		getContentPane().add(piano);
 		getContentPane().add(Box.createRigidArea(new Dimension(10, 1)));
@@ -155,14 +157,12 @@ public class App extends JFrame {
 	}
 	
 	void start() {
-		removeKeyListener(piano);
 		player.start();
 	}
 	
 	boolean stopIfPlaying() {
 		if(player.isPlaying()) {
 			player.stop();
-			addKeyListener(piano);
 			return true;
 		}
 		return false;
@@ -302,18 +302,42 @@ public class App extends JFrame {
 		// TODO implement
 	}
 
-	void noteChanged(int i, int value, boolean selected) {
-		stopIfPlaying();
-		Note note = currentMeasure().note(i);
+	void rollHoleChanged(int index, int value, boolean selected) {
+		Note note = currentMeasure().note(index);
+		noteChanged(note, value, selected);
+		// May be the new rightmost empty note
+		if(note.isEmpty()) {
+			resolutionChanged(bar.getResolution());			
+		}
+	}
+
+	public void writePianoKeysIntoRoll() {
+		// Do nothing if triggered during playback or user is holding a piano key
+		if(piano.hasHeldKey()) {
+			return;
+		}
+		Note note = currentMeasure().firstEmptyNote();
+		if(note != null) {
+			piano.getHeldKeys().forEach(value -> noteChanged(note, value, true));
+			// Update Roll GUI
+			setMeasure(measure);
+		}
+		piano.releaseKeys();
+	}
+	
+	public void releasePianoKeys() {
+		if(piano.hasHeldKey()) {
+			return;
+		}
+		piano.releaseKeys();
+	}
+	
+	private void noteChanged(Note note, int value, boolean selected) {
 		if(selected) {
 			note.add(value);
 		}
 		else {
 			note.remove(value);
-			// May be the new rightmost empty note
-			if(note.isEmpty()) {
-				resolutionChanged(bar.getResolution());
-			}
 		}
 	}
 }

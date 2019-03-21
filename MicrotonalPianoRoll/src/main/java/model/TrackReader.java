@@ -55,6 +55,9 @@ public class TrackReader {
 				});
 				track.add(bpm.get(), note);
 			});
+			if(!track.lastMeasure().isFull()) {
+				throw new SAXException("Last measure does not end properly");
+			}
 			return track;
 		}
 		catch(IllegalArgumentException e) {

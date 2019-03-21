@@ -2,76 +2,53 @@ package gui;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JPanel;
 
-import main.Synth;
+import gui.Key.KeyState;
 import model.Note;
 
-public class Piano extends JPanel implements KeyListener {
+public class Piano extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private final Synth synth;
+	final App app;
 	private final Key[] keys;
 	
-	Piano(Synth synth, int numKeys) {
-		this.synth = synth;
+	Piano(App app, int numKeys) {
+		this.app = app;
 		keys = new Key[numKeys];
 		setLayout(new GridLayout(numKeys, 1));
-		for (int i = 0; i < numKeys; i++) {
-			keys[i] = new Key(i);
-			add(keys[i], 0);
-		}
+		rebuildKeys(true);
 		setPreferredSize(new Dimension(Const.KEY_SIZE.width, numKeys * Const.KEY_SIZE.height));
 		setMaximumSize(new Dimension(Const.KEY_SIZE.width, Integer.MAX_VALUE));
 	}
-	
-	void play(Note note) {
-		stop();
-		note.forEach(key -> keys[key].setSelected(true));
-	}
-	
-	void stop() {
-		Arrays.stream(keys).forEach(key -> key.setSelected(false));
-	}
 
-	@Override
-	public void keyPressed(KeyEvent arg0) {
-		switch(arg0.getKeyCode())
-		{
-		case KeyEvent.VK_F1:
-			synth.play(0);
-			break;
-		case KeyEvent.VK_F2:
-			synth.play(1);
-			break;
-		case KeyEvent.VK_F3:
-			synth.play(2);
-			break;
+	void rebuildKeys(boolean interactive) {
+		removeAll();
+		for (int i = 0; i < keys.length; i++) {
+			add(keys[i] = new Key(i, interactive ? app.synth : null), 0);
 		}
+		revalidate();
 	}
-
-	@Override
-	public void keyReleased(KeyEvent arg0) {
-		switch(arg0.getKeyCode())
-		{
-		case KeyEvent.VK_F1:
-			synth.stop(0);
-			break;
-		case KeyEvent.VK_F2:
-			synth.stop(1);
-			break;
-		case KeyEvent.VK_F3:
-			synth.stop(2);
-			break;
-		}	
+	
+	void hold(Note note) {
+		releaseKeys();
+		note.forEach(key -> keys[key].setUIState(KeyState.Active));
 	}
-
-	@Override
-	public void keyTyped(KeyEvent arg0) {
+	
+	void releaseKeys() {
+		Arrays.stream(keys).forEach(key -> key.release());
+	}
+	
+	public boolean hasHeldKey() {
+		return Key.pressedOn != null;
+	}
+	
+	public List<Integer> getHeldKeys() {
+		return Arrays.stream(keys).filter(Key::isPlaying).map(Key::getIndex).collect(Collectors.toList());
 	}
 }
