@@ -2,13 +2,12 @@ package gui;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.JPanel;
 
-import gui.Key.KeyState;
 import model.Note;
 
 public class Piano extends JPanel {
@@ -30,25 +29,31 @@ public class Piano extends JPanel {
 	void rebuildKeys(boolean interactive) {
 		removeAll();
 		for (int i = 0; i < keys.length; i++) {
+			// In interactive mode keys will call start and stop on the synth
 			add(keys[i] = new Key(i, interactive ? app.synth : null), 0);
 		}
 		revalidate();
 	}
 	
-	void hold(Note note) {
-		releaseKeys();
-		note.forEach(key -> keys[key].setUIState(KeyState.Active));
+	void press(Note note) {
+		release();
+		note.forEach(key -> keys[key].press());
 	}
 	
-	void releaseKeys() {
+	void release() {
 		Arrays.stream(keys).forEach(key -> key.release());
 	}
 	
-	public boolean hasHeldKey() {
+	boolean hasKeyBeingPressed() {
 		return Key.pressedOn != null;
 	}
 	
-	public List<Integer> getHeldKeys() {
-		return Arrays.stream(keys).filter(Key::isPlaying).map(Key::getIndex).collect(Collectors.toList());
+	List<Integer> readActiveKeys() {
+		List<Integer> keys = new ArrayList<>();
+		Arrays.stream(this.keys).filter(Key::isActive).forEach(key -> {
+			keys.add(key.index);
+			key.setInactive();
+		});
+		return keys;
 	}
 }

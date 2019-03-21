@@ -312,24 +312,24 @@ public class App extends JFrame {
 	}
 
 	public void writePianoKeysIntoRoll() {
-		// Do nothing if triggered during playback or user is holding a piano key
-		if(piano.hasHeldKey()) {
+		// Do nothing if the user is still holding a piano key
+		if(piano.hasKeyBeingPressed()) {
 			return;
 		}
+		List<Integer> keys = piano.readActiveKeys();
 		Note note = currentMeasure().firstEmptyNote();
 		if(note != null) {
-			piano.getHeldKeys().forEach(value -> noteChanged(note, value, true));
-			// Update Roll GUI
+			// Register the new note and reload roll measure
+			keys.forEach(value -> noteChanged(note, value, true));
 			setMeasure(measure);
 		}
-		piano.releaseKeys();
 	}
 	
 	public void releasePianoKeys() {
-		if(piano.hasHeldKey()) {
+		if(piano.hasKeyBeingPressed()) {
 			return;
 		}
-		piano.releaseKeys();
+		piano.readActiveKeys();
 	}
 	
 	private void noteChanged(Note note, int value, boolean selected) {

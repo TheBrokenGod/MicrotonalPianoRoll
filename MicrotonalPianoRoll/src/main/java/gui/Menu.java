@@ -116,8 +116,9 @@ class Menu extends JMenuBar {
 	private JMenuItem buildMenuItem(String text, Runnable action, Integer keyCode, Integer modifiers) {
 		JMenuItem item = new JMenuItem(text);
 		item.addActionListener(e -> {
-			app.stopIfPlaying();
-			action.run();	
+			if(!app.stopIfPlaying()) {
+				action.run();				
+			}
 		});
 		if(keyCode != null) {
 			item.setAccelerator(KeyStroke.getKeyStroke(keyCode, modifiers != null ? modifiers : 0));
@@ -130,8 +131,9 @@ class Menu extends JMenuBar {
 		radio.getModel().setActionCommand(text);
 		group.add(radio);
 		radio.addActionListener(e -> {
-			app.stopIfPlaying();
-			app.resolutionChanged(e.getActionCommand());	
+			if(!app.stopIfPlaying()) {
+				app.resolutionChanged(e.getActionCommand());
+			}
 		});
 		return radio;
 	}

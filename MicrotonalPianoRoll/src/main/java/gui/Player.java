@@ -70,7 +70,7 @@ class Player {
 			for(int i = app.measure; i < app.track.measuresCount(); i++) {
 				for(Note note : app.track.measure(i)) {
 					// Show played keys as pressed
-					SwingUtilities.invokeAndWait(() -> app.piano.hold(note));
+					SwingUtilities.invokeAndWait(() -> app.piano.press(note));
 					app.synth.sleepUntil(time += note.length.absolute());
 				}
 			}

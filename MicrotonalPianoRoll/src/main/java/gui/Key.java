@@ -12,58 +12,55 @@ import main.Synth;
 public class Key extends JToggleButton implements MouseListener {
 	
 	private static final long serialVersionUID = 1L;
-	static enum KeyState {
+	private static enum KeyState {
 		Inactive, InactiveFocused, InactiveToActive, ActiveToInactive, ActiveFocused, Active
 	}	
 	private static Key cursorPos = null;
 	static Key pressedOn = null;
 
-	private final int index;
+	final int index;
 	private final Synth synth;
 	private KeyState state;
 	
 	Key(int index, Synth synth) {
 		this.index = index;
 		this.synth = synth;
-		setUIState(KeyState.Inactive);
+		setState(KeyState.Inactive);
 		setBorder(Const.KEY_BORDER);
 		setFocusable(false);
-		// If composing mode
 		if(synth != null) {
+			// Interactive mode
 			addMouseListener(this);
+			cursorPos = null;
+			pressedOn = null;
 		}
 	}
 
-	void setUIState(KeyState state) {
+	private void setState(KeyState state) {
 		this.state = state;
 		repaint();
 	}
 	
-	static boolean keyHeld() {
-		return pressedOn != null;
-	}
-	
-	boolean isPlaying() {
-		return state == KeyState.Active || state == KeyState.ActiveFocused;
-	}
-	
-	int getIndex() {
-		return index;
+	void press() {
+		setState(KeyState.Active);
 	}
 	
 	void release() {
-		// Can be playback or interactive
+		setState(KeyState.Inactive);		
+	}
+	
+	boolean isActive() {
+		return state == KeyState.Active || state == KeyState.ActiveFocused;
+	}
+	
+	void setInactive() {
 		if(state == KeyState.Active) {
-			setUIState(KeyState.Inactive);
+			setState(KeyState.Inactive);
 		}
-		// Can be only in interactive mode
 		else if(state == KeyState.ActiveFocused) {
-			setUIState(KeyState.InactiveFocused);
+			setState(KeyState.InactiveFocused);
 		}
-		// If interactive
-		if(synth != null) {
-			synth.stop(index);
-		}
+		synth.stop(index);
 	}
 	
 	@Override
@@ -102,10 +99,10 @@ public class Key extends JToggleButton implements MouseListener {
 			switch(state) 
 			{
 			case Inactive:
-				setUIState(KeyState.InactiveFocused);
+				setState(KeyState.InactiveFocused);
 				break;
 			case Active:
-				setUIState(KeyState.ActiveFocused);
+				setState(KeyState.ActiveFocused);
 				break;
 			default:
 				throw new RuntimeException();
@@ -115,11 +112,11 @@ public class Key extends JToggleButton implements MouseListener {
 			switch(state)
 			{
 			case Inactive:
-				setUIState(KeyState.InactiveToActive);
+				setState(KeyState.InactiveToActive);
 				synth.play(index);
 				break;
 			case Active:
-				setUIState(KeyState.ActiveToInactive);
+				setState(KeyState.ActiveToInactive);
 				synth.stop(index);
 				break;
 			default:
@@ -136,12 +133,12 @@ public class Key extends JToggleButton implements MouseListener {
 		case InactiveToActive:
 			synth.stop(index);
 		case InactiveFocused:
-			setUIState(KeyState.Inactive);
+			setState(KeyState.Inactive);
 			break;
 		case ActiveToInactive:
 			synth.play(index);
 		case ActiveFocused:
-			setUIState(KeyState.Active);
+			setState(KeyState.Active);
 			break;
 		default:
 			throw new RuntimeException();
@@ -157,11 +154,11 @@ public class Key extends JToggleButton implements MouseListener {
 		switch(state)
 		{
 		case InactiveFocused:
-			setUIState(KeyState.InactiveToActive);
+			setState(KeyState.InactiveToActive);
 			synth.play(index);
 			break;
 		case ActiveFocused:
-			setUIState(KeyState.ActiveToInactive);
+			setState(KeyState.ActiveToInactive);
 			synth.stop(index);
 			break;
 		default:
@@ -181,11 +178,11 @@ public class Key extends JToggleButton implements MouseListener {
 		switch(cursorPos.state)
 		{
 		case InactiveToActive:
-			cursorPos.setUIState(KeyState.ActiveFocused);
+			cursorPos.setState(KeyState.ActiveFocused);
 			cursorPos.setSelected(true);
 			break;
 		case ActiveToInactive:
-			cursorPos.setUIState(KeyState.InactiveFocused);
+			cursorPos.setState(KeyState.InactiveFocused);
 			cursorPos.setSelected(false);
 			break;
 		default:
