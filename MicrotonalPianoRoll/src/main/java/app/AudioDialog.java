@@ -89,11 +89,11 @@ class AudioDialog extends JDialog implements ActionListener, KeyListener {
 			if(keys < 1) {
 				throw new IllegalArgumentException("Number of keys should be greater than 0");
 			}
+			dispose();
 			Track track = new Track(lower, higher, steps, offset, keys);
 			// Add default content for new file
 			Const.defaultTrack().copyTo(track);
 			callback.accept(track);
-			dispose();
 		}
 		catch(IllegalArgumentException e) {
 			JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

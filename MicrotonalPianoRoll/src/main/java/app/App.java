@@ -2,6 +2,7 @@ package app;
 
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ class App extends JFrame {
 	int measure;
 	Player player;
 	private File file;
-	private boolean changed;
+	private boolean modified;
 
 	App(Track track) {
 		JPanel root = new JPanel();
@@ -63,6 +64,7 @@ class App extends JFrame {
 	}
 
 	public void setTrack(Track track) {
+		setVisible(false);
 		if(piano != null) {
 			synth.dispose();
 		}
@@ -76,25 +78,28 @@ class App extends JFrame {
 		getContentPane().add(Box.createRigidArea(new Dimension(10, 1)));
 		getContentPane().add(roll);
 		setMeasure(0);
-		revalidate();
 		pack();
+		// Keep inside vertical screen boundaries
+		int height = Math.min(getSize().height, Math.round(0.9f * Toolkit.getDefaultToolkit().getScreenSize().height));
+		setSize(new Dimension(getSize().width, height));
 		setLocationRelativeTo(null);
+		setVisible(true);
 	}
 	
 	private void setFile(File file) {
 		this.file = file;
-		updateTitle();
+		setFileModified(false);
 	}
 	
-	private void setFileChanged(boolean changed) {
-		this.changed = changed;
+	private void setFileModified(boolean modified) {
+		this.modified = modified;
 		updateTitle();
 	}
 	
 	private void updateTitle() {
 		String title = "Microtonal Piano Roll :: ";
 		if(file != null) {
-			title += file.getName() + (changed ? "*" : "") + " :: ";
+			title += file.getName() + (modified ? "*" : "") + " :: ";
 		}
 		title += track.toString();
 		if(isPlaying()) {
@@ -133,7 +138,7 @@ class App extends JFrame {
 		}
 		else {
 			new TrackWriter(file).write(track);
-			setFileChanged(false);
+			setFileModified(false);
 		}
 	}
 	
@@ -170,7 +175,7 @@ class App extends JFrame {
 		// Keep previous notes
 		this.track.copyTo(track);
 		setTrack(track);
-		setFileChanged(true);
+		setFileModified(true);
 	}
 	
 	void setOscillator() {
@@ -214,7 +219,7 @@ class App extends JFrame {
 	void nextMeasure() {
 		if(measure == track.measuresCount() - 1) {
 			track.add(new Measure(track.lastMeasure().getBPM(), bar.getResolution()));
-			setFileChanged(true);
+			setFileModified(true);
 		}
 		setMeasure(measure + 1);
 	}
@@ -244,7 +249,7 @@ class App extends JFrame {
 			return;
 		}
 		int measure = this.measure - 1;
-		int bpm = currentMeasure().getBPM();
+		int bpm = track.measure(measure).getBPM();
 		// Move at the beginning of the tempo group of the previous measure 
 		for (int i = measure - 1; i >= 0 && track.measure(i).getBPM() == bpm; i--) {
 			measure = i;
@@ -265,7 +270,7 @@ class App extends JFrame {
 	void insertMeasure() {
 		track.insert(measure, new Measure(currentMeasure().getBPM(), bar.getResolution()));
 		setMeasure(measure);
-		setFileChanged(true);
+		setFileModified(true);
 	}
 	
 	void deleteMeasure() {
@@ -274,7 +279,7 @@ class App extends JFrame {
 		}
 		track.remove(measure);
 		setMeasure(Math.min(measure, track.measuresCount() - 1));
-		setFileChanged(true);
+		setFileModified(true);
 	}
 	
 	void setTempoChange() {
@@ -289,7 +294,7 @@ class App extends JFrame {
 				}
 				// Update bar text
 				setMeasure(measure);
-				setFileChanged(true);
+				setFileModified(true);
 			}
 		}
 		catch(NumberFormatException e) {
@@ -306,7 +311,7 @@ class App extends JFrame {
 			track.measure(i).setBPM(track.measure(i - 1).getBPM());		
 		}
 		setMeasure(measure);	
-		setFileChanged(true);
+		setFileModified(true);
 	}
 	
 	void setMeasure(int measure) {
@@ -327,7 +332,7 @@ class App extends JFrame {
 			// Check if empty space can be filled with notes at new resolution
 			if(10 * NoteLength.inverse(resolution) % (int)Math.round(10 / measure.freeSpace()) == 0) {
 				measure.fill(resolution);
-				setFileChanged(true);
+				setFileModified(true);
 			}
 			else {
 				// Otherwise restore
@@ -374,6 +379,6 @@ class App extends JFrame {
 		else {
 			note.remove(value);
 		}
-		setFileChanged(true);
+		setFileModified(true);
 	}
 }
