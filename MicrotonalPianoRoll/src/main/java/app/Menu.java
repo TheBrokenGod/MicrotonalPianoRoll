@@ -122,7 +122,7 @@ class Menu extends JMenuBar {
 	}
 	
 	void setMeasure(int measure, boolean tempoChange) {
-		this.measure.setText("Measure " + (measure + 1) + (tempoChange ? "*" : "") + " of " + track.measuresCount() + " ");
+		this.measure.setText("Measure " + (measure + 1) + (tempoChange ? "*" : "") + " of " + track.measuresCount() + "  ");
 		// Keep resolution menu radio selection consistent with the last note in the measure
 		getResolutionRadio(track.measure(measure).lastNote().length.name()).setSelected(true);
 	}

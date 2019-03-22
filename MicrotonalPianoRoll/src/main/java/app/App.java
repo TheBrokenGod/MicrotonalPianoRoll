@@ -79,9 +79,12 @@ class App extends JFrame {
 		getContentPane().add(roll);
 		setMeasure(0);
 		pack();
-		// Keep inside vertical screen boundaries
-		int height = Math.min(getSize().height, Math.round(0.9f * Toolkit.getDefaultToolkit().getScreenSize().height));
-		setSize(new Dimension(getSize().width, height));
+		// Keep inside screen boundaries
+		Dimension frameSize = new Dimension(
+			Math.min(getSize().width, Math.round(0.9f * Toolkit.getDefaultToolkit().getScreenSize().width)),
+			Math.min(getSize().height, Math.round(0.9f * Toolkit.getDefaultToolkit().getScreenSize().height))
+		);
+		setSize(frameSize);
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}

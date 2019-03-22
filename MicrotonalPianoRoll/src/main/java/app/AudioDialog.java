@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.function.Consumer;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -32,11 +33,11 @@ class AudioDialog extends JDialog implements ActionListener, KeyListener {
 	private final Consumer<Track> callback;
 	
 	public AudioDialog(App app, Track initial, Consumer<Track> callback) {
-		super(app, "Tones", true);
+		super(app, "Audio Frequencies", true);
 		this.callback = callback;
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		panel.add(Box.createRigidArea(new Dimension(1, 5)));
+		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		setContentPane(panel);
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
@@ -61,13 +62,13 @@ class AudioDialog extends JDialog implements ActionListener, KeyListener {
 		offset.addKeyListener(this);
 		keys.addKeyListener(this);
 		getContentPane().add(panel);
+		getContentPane().add(Box.createRigidArea(new Dimension(1, 10)));
 		panel = new JPanel(new GridLayout(1, 1));
 		confirm = new JButton("OK");
 		confirm.addActionListener(this);
 		panel.add(confirm);
-		getContentPane().add(Box.createRigidArea(new Dimension(1, 5)));
 		getContentPane().add(panel);
-		pack();
+		setSize(320, 200);
 		setLocationRelativeTo(app);
 		setVisible(true);
 	}
