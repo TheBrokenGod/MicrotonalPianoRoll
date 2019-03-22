@@ -30,10 +30,6 @@ class RollHole extends JPanel {
 		button.setSelected(selected);
 	}
 	
-	boolean isSelected() {
-		return button.isSelected();
-	}
-
 	public void setProgress(double progress) {
 		this.progress = progress;
 		button.repaint();
@@ -53,7 +49,12 @@ class RollHole extends JPanel {
 			this.row = row;
 			setBorder(Const.HOLE_BORDER);
 			setFocusable(false);
-			addActionListener(this);
+			if(!app.isPlaying()) {
+				addActionListener(this);
+			}
+			else {
+				setEnabled(false);
+			}
 		}
 		
 		@Override
@@ -76,12 +77,7 @@ class RollHole extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if(!app.stopIfPlaying()) {
-				app.rollHoleChanged(note, row, isSelected());
-			}
-			else {
-				setSelected(!isSelected());
-			}
+			app.rollHoleChanged(note, row, isSelected());
 		}
 	}
 }

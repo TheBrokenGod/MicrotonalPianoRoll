@@ -39,27 +39,6 @@ class Menu extends JMenuBar {
 		add(panel);
 	}
 	
-	void setMeasure(int measure, boolean tempoChange) {
-		this.measure.setText("Measure " + (measure + 1) + (tempoChange ? "*" : "") + " of " + track.measuresCount() + " ");
-		// Keep resolution menu radio selection consistent with the last note in the measure
-		getResolutionRadio(track.measure(measure).lastNote().length.name()).setSelected(true);
-	}
-	
-	private AbstractButton getResolutionRadio(String resolution) {
-		Enumeration<AbstractButton> buttons = group.getElements();
-		while(buttons.hasMoreElements()) {
-			AbstractButton button = buttons.nextElement();
-			if(button.getText().equals(resolution)) {
-				return button;
-			}
-		}
-		return null;
-	}
-	
-	String getResolution() {
-		return group.getSelection().getActionCommand();
-	}
-	
 	private void buildMenus() {
 		JMenu menu, sub;
 		add(menu = new JMenu("Track"));
@@ -116,8 +95,8 @@ class Menu extends JMenuBar {
 	private JMenuItem buildMenuItem(String text, Runnable action, Integer keyCode, Integer modifiers) {
 		JMenuItem item = new JMenuItem(text);
 		item.addActionListener(e -> {
-			if(!app.stopIfPlaying()) {
-				action.run();				
+			if(!app.isPlaying()) {
+				action.run();
 			}
 		});
 		if(keyCode != null) {
@@ -131,11 +110,32 @@ class Menu extends JMenuBar {
 		radio.getModel().setActionCommand(text);
 		group.add(radio);
 		radio.addActionListener(e -> {
-			if(!app.stopIfPlaying()) {
+			if(!app.isPlaying()) {
 				app.resolutionChanged(e.getActionCommand());
 			}
 		});
 		return radio;
+	}
+	
+	void setMeasure(int measure, boolean tempoChange) {
+		this.measure.setText("Measure " + (measure + 1) + (tempoChange ? "*" : "") + " of " + track.measuresCount() + " ");
+		// Keep resolution menu radio selection consistent with the last note in the measure
+		getResolutionRadio(track.measure(measure).lastNote().length.name()).setSelected(true);
+	}
+	
+	private AbstractButton getResolutionRadio(String resolution) {
+		Enumeration<AbstractButton> buttons = group.getElements();
+		while(buttons.hasMoreElements()) {
+			AbstractButton button = buttons.nextElement();
+			if(button.getText().equals(resolution)) {
+				return button;
+			}
+		}
+		return null;
+	}
+	
+	String getResolution() {
+		return group.getSelection().getActionCommand();
 	}
 	
 	private void increaseResolution() {

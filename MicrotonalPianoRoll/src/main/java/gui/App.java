@@ -38,9 +38,9 @@ public class App extends JFrame {
 	public App(Track track) {
 		JPanel root = new JPanel();
 		root.setLayout(new BoxLayout(root, BoxLayout.LINE_AXIS));
-		setContentPane(root);		
+		setContentPane(root);
+		player = new Player(this);		
 		setTrack(track);
-		player = new Player(this);
 		file = null;
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -151,21 +151,22 @@ public class App extends JFrame {
 	}
 	
 	void startOrStop() {
-		if(!stopIfPlaying()) {
-			start();
+		if(!isPlaying()) {
+			player.start();
+		}
+		else {
+			player.stop();
 		}
 	}
 	
-	void start() {
-		player.start();
+	boolean isPlaying() {
+		return player.isPlaying();
 	}
 	
-	boolean stopIfPlaying() {
+	void stopIfPlaying() {
 		if(player.isPlaying()) {
 			player.stop();
-			return true;
 		}
-		return false;
 	}
 	
 	void previousMeasure() {
@@ -313,20 +314,20 @@ public class App extends JFrame {
 
 	public void writePianoKeysIntoRoll() {
 		// Do nothing if the user is still holding a piano key
-		if(piano.hasKeyBeingPressed()) {
+		if(piano.isKeyBeingPressed()) {
 			return;
 		}
 		List<Integer> keys = piano.readActiveKeys();
 		Note note = currentMeasure().firstEmptyNote();
 		if(note != null) {
-			// Register the new note and reload roll measure
+			// Register the new note and reload measure
 			keys.forEach(value -> noteChanged(note, value, true));
 			setMeasure(measure);
 		}
 	}
 	
 	public void releasePianoKeys() {
-		if(piano.hasKeyBeingPressed()) {
+		if(piano.isKeyBeingPressed()) {
 			return;
 		}
 		piano.readActiveKeys();

@@ -9,27 +9,27 @@ import javax.swing.JToggleButton;
 
 import main.Synth;
 
-public class Key extends JToggleButton implements MouseListener {
+public class PianoKey extends JToggleButton implements MouseListener {
 	
 	private static final long serialVersionUID = 1L;
 	private static enum KeyState {
 		Inactive, InactiveFocused, InactiveToActive, ActiveToInactive, ActiveFocused, Active
 	}	
-	private static Key cursorPos = null;
-	static Key pressedOn = null;
+	private static PianoKey cursorPos = null;
+	static PianoKey pressedOn = null;
 
 	final int index;
 	private final Synth synth;
 	private KeyState state;
 	
-	Key(int index, Synth synth) {
+	PianoKey(int index, Synth synth) {
 		this.index = index;
 		this.synth = synth;
 		setState(KeyState.Inactive);
 		setBorder(Const.KEY_BORDER);
 		setFocusable(false);
+		// If editing mode
 		if(synth != null) {
-			// Interactive mode
 			addMouseListener(this);
 			cursorPos = null;
 			pressedOn = null;
@@ -41,18 +41,10 @@ public class Key extends JToggleButton implements MouseListener {
 		repaint();
 	}
 	
-	void press() {
-		setState(KeyState.Active);
-	}
-	
-	void release() {
-		setState(KeyState.Inactive);		
-	}
-	
 	boolean isActive() {
 		return state == KeyState.Active || state == KeyState.ActiveFocused;
 	}
-	
+
 	void setInactive() {
 		if(state == KeyState.Active) {
 			setState(KeyState.Inactive);
@@ -61,6 +53,14 @@ public class Key extends JToggleButton implements MouseListener {
 			setState(KeyState.InactiveFocused);
 		}
 		synth.stop(index);
+	}
+
+	void press() {
+		setState(KeyState.Active);
+	}
+
+	void release() {
+		setState(KeyState.Inactive);		
 	}
 	
 	@Override
@@ -165,7 +165,7 @@ public class Key extends JToggleButton implements MouseListener {
 			throw new RuntimeException();
 		}
 	}
-	
+
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if(e.getButton() != MouseEvent.BUTTON1) {

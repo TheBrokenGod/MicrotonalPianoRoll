@@ -66,30 +66,30 @@ public class Synth {
 	public Synth(Track track) {
 		this(track, Synth.defaultOscillator());
 	}
-	
+
+	public void play(int key) {
+		keys[key].amplitude.set(1);
+	}
+
+	public void stop(int key) {
+		keys[key].amplitude.set(0);
+	}
+
 	public void play(Note note) {
 		stop();
 		note.forEach(key -> play(key));
 	}
 
-	public void play(int key) {
-		keys[key].amplitude.set(1);
-	}
-	
 	public void stop() {
 		for (int i = 0; i < keys.length; i++) {
 			stop(i);
 		}
 	}
 	
-	public void stop(int key) {
-		keys[key].amplitude.set(0);
-	}
-	
 	public double getCurrentTime() {
 		return synth.getCurrentTime();
 	}
-	
+
 	public void sleepUntil(double time) throws InterruptedException {
 		synth.sleepUntil(time);
 	}

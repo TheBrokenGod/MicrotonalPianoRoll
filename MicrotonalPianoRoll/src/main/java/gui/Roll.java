@@ -57,7 +57,7 @@ class Roll extends JPanel {
 	void setProgress(Note note, double progress) {
 		notes.get(note).forEach(rollNote -> rollNote.setProgress(progress));
 	}
-	
+
 	void clearProgress() {
 		notes.values().forEach(list -> list.forEach(rollNote -> rollNote.setProgress(0)));
 	}
