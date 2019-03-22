@@ -1,4 +1,4 @@
-package gui;
+package app;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 
 import model.Note;
 
-public class Piano extends JPanel {
+class Piano extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 

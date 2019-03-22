@@ -73,4 +73,13 @@ public class Track implements Iterable<Measure> {
 		track.measures.clear();
 		track.measures.addAll(measures);
 	}
+	
+	@Override
+	public String toString() {
+		return format(calcFrequencyAt(0)) + " - " + format(calcFrequencyAt(numKeys - 1));
+	}
+	
+	private static String format(double freq) {
+		return String.format("%.2f Hz", freq);
+	}
 }

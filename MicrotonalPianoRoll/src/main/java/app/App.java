@@ -1,4 +1,4 @@
-package gui;
+package app;
 
 import java.awt.Dimension;
 import java.io.File;
@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 
 import org.xml.sax.SAXException;
 
-import main.Synth;
 import model.Measure;
 import model.Note;
 import model.NoteLength;
@@ -23,6 +22,15 @@ import model.TrackReader;
 import model.TrackWriter;
 
 public class App extends JFrame {
+	
+	public static void main(String[] args) {
+		try {
+			new App();
+		}
+		catch(Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
 
 	private static final long serialVersionUID = 1L;
 	
@@ -48,7 +56,7 @@ public class App extends JFrame {
 	}
 	
 	public App() {
-		this(Const.DEFAULT_TRACK);
+		this(Const.defaultTrack());
 	}
 
 	public void setTrack(Track track) {
@@ -70,12 +78,10 @@ public class App extends JFrame {
 	}
 	
 	void newFile() {
-		new AudioDialog(this, Const.DEFAULT_TRACK, this::doNewFile);
+		new AudioDialog(this, Const.defaultTrack(), this::doNewFile);
 	}
 	
 	void doNewFile(Track track) {
-		// Add a first empty measure
-		track.add(new Measure(Const.DEFAULT_BPM, bar.getResolution()));
 		setTrack(track);
 	}
 
@@ -152,10 +158,12 @@ public class App extends JFrame {
 	
 	void startOrStop() {
 		if(!isPlaying()) {
+			setTitle(getTitle() + " :: Playing");
 			player.start();
 		}
 		else {
 			player.stop();
+			setTitle(getTitle().substring(0, getTitle().lastIndexOf(" ::")));
 		}
 	}
 	
@@ -165,7 +173,7 @@ public class App extends JFrame {
 	
 	void stopIfPlaying() {
 		if(player.isPlaying()) {
-			player.stop();
+			startOrStop();
 		}
 	}
 	

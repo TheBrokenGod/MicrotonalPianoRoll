@@ -1,4 +1,4 @@
-package gui;
+package app;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -89,7 +89,10 @@ class AudioDialog extends JDialog implements ActionListener, KeyListener {
 			if(keys < 1) {
 				throw new IllegalArgumentException("Number of keys should be greater than 0");
 			}
-			callback.accept(new Track(lower, higher, steps, offset, keys));
+			Track track = new Track(lower, higher, steps, offset, keys);
+			// Add default content for new file
+			Const.defaultTrack().copyTo(track);
+			callback.accept(track);
 			dispose();
 		}
 		catch(IllegalArgumentException e) {

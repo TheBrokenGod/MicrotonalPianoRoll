@@ -1,4 +1,4 @@
-package gui;
+package app;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,12 +8,16 @@ import javax.swing.border.Border;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import model.Measure;
 import model.Track;
 
-public class Const {
+class Const {
 
-	static final Track DEFAULT_TRACK = new Track(440, 880, 12, -12, 12);
-	static final int DEFAULT_BPM = 60;
+	static final Track defaultTrack() {
+		Track track = new Track(440, 880, 12, -12, 13);
+		track.add(new Measure(60, "4"));
+		return track;
+	}
 	
 	static final FileFilter FILE_TYPE_FILTER = new FileNameExtensionFilter("Microtonal Piano Roll XML file", "xml");
 	static final Dimension KEY_SIZE = new Dimension(128, 36);

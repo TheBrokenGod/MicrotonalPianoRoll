@@ -1,4 +1,4 @@
-package gui;
+package app;
 
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -7,9 +7,7 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JToggleButton;
 
-import main.Synth;
-
-public class PianoKey extends JToggleButton implements MouseListener {
+class PianoKey extends JToggleButton implements MouseListener {
 	
 	private static final long serialVersionUID = 1L;
 	private static enum KeyState {

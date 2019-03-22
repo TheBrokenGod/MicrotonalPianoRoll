@@ -1,4 +1,4 @@
-package main;
+package app;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ import com.jsyn.unitgen.UnitOscillator;
 import model.Note;
 import model.Track;
 
-public class Synth {
+class Synth {
 
 	private static final Map<String, Class<? extends UnitOscillator>> oscillators;
 	static {
