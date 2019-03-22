@@ -1,18 +1,19 @@
 package model;
 
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Note implements Iterable<Integer> {
 
-	private final Set<Integer> values;
+	private final SortedSet<Integer> values;
 	public final NoteLength length;
 	
 	public Note(String length) {
 		this.length = new NoteLength(length);
-		values = new HashSet<>();
+		values = new TreeSet<>();
 	}
 	
 	public void add(int value) {
@@ -30,6 +31,10 @@ public class Note implements Iterable<Integer> {
 	@Override
 	public Iterator<Integer> iterator() {
 		return values.iterator();
+	}
+	
+	public Stream<Integer> values() {
+		return values.stream();
 	}
 	
 	@Override

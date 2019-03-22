@@ -88,8 +88,6 @@ class Menu extends JMenuBar {
 		menu.add(sub = new JMenu("Tempo change"));
 		sub.add(buildMenuItem("Set", app::setTempoChange, KeyEvent.VK_INSERT, KeyEvent.CTRL_DOWN_MASK));
 		sub.add(buildMenuItem("Clear", app::clearTempoChange, KeyEvent.VK_DELETE, KeyEvent.CTRL_DOWN_MASK));
-		add(menu = new JMenu("About"));
-		menu.add(buildMenuItem("Info", app::showInfoDialog, null, null));
 	}
 	
 	private JMenuItem buildMenuItem(String text, Runnable action, Integer keyCode, Integer modifiers) {

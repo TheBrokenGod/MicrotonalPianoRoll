@@ -92,10 +92,6 @@ public class TrackReader {
 		}
 	}
 	
-//	private String getString(String expression, int minLength) {
-//		return getString(expression, document, minLength);
-//	}
-	
 	private int getInt(String expression, XdmItem context, int minValue) {
 		return (int) getReal(expression, context, minValue);
 	}

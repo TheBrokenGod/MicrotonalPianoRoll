@@ -17,8 +17,7 @@ class Const {
 		Track track = new Track(440, 880, 12, -12, 13);
 		track.add(new Measure(60, "4"));
 		return track;
-	}
-	
+	}	
 	static final FileFilter FILE_TYPE_FILTER = new FileNameExtensionFilter("Microtonal Piano Roll XML file", "xml");
 	static final Dimension KEY_SIZE = new Dimension(128, 36);
 	static final int BORDER_THICKNESS = 1;

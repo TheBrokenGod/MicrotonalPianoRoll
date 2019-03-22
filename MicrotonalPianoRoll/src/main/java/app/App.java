@@ -1,6 +1,7 @@
 package app;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ import model.Track;
 import model.TrackReader;
 import model.TrackWriter;
 
-public class App extends JFrame {
+class App extends JFrame {
 	
 	public static void main(String[] args) {
 		try {
@@ -42,21 +43,46 @@ public class App extends JFrame {
 	int measure;
 	Player player;
 	private File file;
+	private boolean changed;
 
-	public App(Track track) {
+	App(Track track) {
+		super("Microtonal Piano Roll :: ::");
 		JPanel root = new JPanel();
 		root.setLayout(new BoxLayout(root, BoxLayout.LINE_AXIS));
 		setContentPane(root);
-		player = new Player(this);		
+		player = new Player(this);
 		setTrack(track);
-		file = null;
-		setLocationRelativeTo(null);
+		setFile(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		Image icon = getToolkit().getImage(getClass().getResource("/app/icon.png"));
+		setIconImage(icon);
 		setVisible(true);
 	}
 	
-	public App() {
+	App() {
 		this(Const.defaultTrack());
+	}
+	
+	private void setFile(File file) {
+		this.file = file;
+		updateTitle();
+	}
+	
+	private void setFileChanged(boolean changed) {
+		this.changed = changed;
+		updateTitle();
+	}
+	
+	private void updateTitle() {
+		String title = "Microtonal Piano Roll :: ";
+		if(file != null) {
+			title += file.getName() + (changed ? "*" : "") + " :: ";
+		}
+		title += track.toString();
+		if(isPlaying()) {
+			title += " :: Playing";
+		}
+		setTitle(title);
 	}
 
 	public void setTrack(Track track) {
@@ -64,7 +90,6 @@ public class App extends JFrame {
 			synth.dispose();
 		}
 		this.track = track;
-		setTitle("Microtonal Piano Roll :: " + track.toString());
 		setJMenuBar(bar = new Menu(this, track));
 		synth = new Synth(track, synth != null ? synth.oscillator() : Synth.defaultOscillator());
 		piano = new Piano(this, track.numKeys);
@@ -75,6 +100,7 @@ public class App extends JFrame {
 		getContentPane().add(roll);
 		setMeasure(0);
 		pack();
+		setLocationRelativeTo(null);
 	}
 	
 	void newFile() {
@@ -83,6 +109,7 @@ public class App extends JFrame {
 	
 	void doNewFile(Track track) {
 		setTrack(track);
+		setFile(null);
 	}
 
 	void openFile() {
@@ -92,6 +119,7 @@ public class App extends JFrame {
 			File file = chooser.getSelectedFile();
 			try {
 				setTrack(new TrackReader(file).read());
+				setFile(file);
 			}
 			catch (SAXException e) {
 				JOptionPane.showMessageDialog(this, "Not a valid file", file.getName(), JOptionPane.ERROR_MESSAGE);
@@ -104,12 +132,8 @@ public class App extends JFrame {
 			saveFileAs();
 		}
 		else {
-			try {
-				new TrackWriter(file).write(track);
-			}
-			catch (SAXException e) {
-				JOptionPane.showMessageDialog(this, "Error saving track", file.getName(), JOptionPane.ERROR_MESSAGE);
-			}
+			new TrackWriter(file).write(track);
+			setFileChanged(false);
 		}
 	}
 	
@@ -146,6 +170,7 @@ public class App extends JFrame {
 		// Keep previous notes
 		this.track.copyTo(track);
 		setTrack(track);
+		setFileChanged(true);
 	}
 	
 	void setOscillator() {
@@ -158,13 +183,12 @@ public class App extends JFrame {
 	
 	void startOrStop() {
 		if(!isPlaying()) {
-			setTitle(getTitle() + " :: Playing");
 			player.start();
 		}
 		else {
 			player.stop();
-			setTitle(getTitle().substring(0, getTitle().lastIndexOf(" ::")));
 		}
+		updateTitle();
 	}
 	
 	boolean isPlaying() {
@@ -190,6 +214,7 @@ public class App extends JFrame {
 	void nextMeasure() {
 		if(measure == track.measuresCount() - 1) {
 			track.add(new Measure(track.lastMeasure().getBPM(), bar.getResolution()));
+			setFileChanged(true);
 		}
 		setMeasure(measure + 1);
 	}
@@ -240,6 +265,7 @@ public class App extends JFrame {
 	void insertMeasure() {
 		track.insert(measure, new Measure(currentMeasure().getBPM(), bar.getResolution()));
 		setMeasure(measure);
+		setFileChanged(true);
 	}
 	
 	void deleteMeasure() {
@@ -248,6 +274,7 @@ public class App extends JFrame {
 		}
 		track.remove(measure);
 		setMeasure(Math.min(measure, track.measuresCount() - 1));
+		setFileChanged(true);
 	}
 	
 	void setTempoChange() {
@@ -262,6 +289,7 @@ public class App extends JFrame {
 				}
 				// Update bar text
 				setMeasure(measure);
+				setFileChanged(true);
 			}
 		}
 		catch(NumberFormatException e) {
@@ -275,9 +303,10 @@ public class App extends JFrame {
 		int old = currentMeasure().getBPM();
 		// Undo tempo change on all measures previously affected by setTempoChange
 		for (int i = measure; i < track.measuresCount() && track.measure(i).getBPM() == old; i++) {
-			track.measure(i).setBPM(track.measure(i - 1).getBPM());			
+			track.measure(i).setBPM(track.measure(i - 1).getBPM());		
 		}
-		setMeasure(measure);
+		setMeasure(measure);	
+		setFileChanged(true);
 	}
 	
 	void setMeasure(int measure) {
@@ -286,7 +315,7 @@ public class App extends JFrame {
 		bar.setMeasure(measure, measure == 0 || currentMeasure().getBPM() != track.measure(measure - 1).getBPM());
 	}
 	
-	// TODO rework from scratch
+	// TODO FIX periodical
 	void resolutionChanged(String resolution) {
 		Measure measure = track.measure(this.measure);
 		// Remove empty notes at the end of the measure
@@ -298,6 +327,7 @@ public class App extends JFrame {
 			// Check if empty space can be filled with notes at new resolution
 			if(10 * NoteLength.inverse(resolution) % (int)Math.round(10 / measure.freeSpace()) == 0) {
 				measure.fill(resolution);
+				setFileChanged(true);
 			}
 			else {
 				// Otherwise restore
@@ -305,10 +335,6 @@ public class App extends JFrame {
 			}
 		}
 		setMeasure(this.measure);	
-	}
-	
-	void showInfoDialog() {
-		// TODO implement
 	}
 
 	void rollHoleChanged(int index, int value, boolean selected) {
@@ -348,5 +374,6 @@ public class App extends JFrame {
 		else {
 			note.remove(value);
 		}
+		setFileChanged(true);
 	}
 }
