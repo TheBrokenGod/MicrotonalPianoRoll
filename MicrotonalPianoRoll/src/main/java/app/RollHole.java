@@ -49,11 +49,15 @@ class RollHole extends JPanel {
 			this.row = row;
 			setBorder(Const.HOLE_BORDER);
 			setFocusable(false);
+			// Same behaviour as PianoKey
 			if(!app.isPlaying()) {
 				addActionListener(this);
 			}
 			else {
-				setEnabled(false);
+				addActionListener(e -> {
+					setSelected(false);
+					app.stopIfPlaying();
+				});
 			}
 		}
 		

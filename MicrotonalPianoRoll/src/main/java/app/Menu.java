@@ -98,6 +98,9 @@ class Menu extends JMenuBar {
 			if(!app.isPlaying()) {
 				action.run();
 			}
+			else {
+				app.stopIfPlaying();
+			}
 		});
 		if(keyCode != null) {
 			item.setAccelerator(KeyStroke.getKeyStroke(keyCode, modifiers != null ? modifiers : 0));
@@ -112,6 +115,9 @@ class Menu extends JMenuBar {
 		radio.addActionListener(e -> {
 			if(!app.isPlaying()) {
 				app.resolutionChanged(e.getActionCommand());
+			}
+			else {
+				app.stopIfPlaying();
 			}
 		});
 		return radio;

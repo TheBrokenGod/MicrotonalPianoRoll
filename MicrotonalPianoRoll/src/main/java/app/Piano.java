@@ -29,8 +29,7 @@ class Piano extends JPanel {
 	void rebuild() {
 		removeAll();
 		for (int i = 0; i < keys.length; i++) {
-			// In interactive mode keys will call start and stop on the synth
-			add(keys[i] = new PianoKey(i, !app.isPlaying() ? app.synth : null), 0);
+			add(keys[i] = new PianoKey(i, app), 0);
 		}
 		revalidate();
 	}

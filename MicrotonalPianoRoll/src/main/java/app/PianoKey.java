@@ -20,17 +20,21 @@ class PianoKey extends JToggleButton implements MouseListener {
 	private final Synth synth;
 	private KeyState state;
 	
-	PianoKey(int index, Synth synth) {
+	PianoKey(int index, App app) {
 		this.index = index;
-		this.synth = synth;
+		this.synth = app.synth;
 		setState(KeyState.Inactive);
 		setBorder(Const.KEY_BORDER);
 		setFocusable(false);
-		// If editing mode
-		if(synth != null) {
+		// If editing mode enable keyboard
+		if(!app.isPlaying()) {
 			addMouseListener(this);
 			cursorPos = null;
 			pressedOn = null;
+		}
+		// If playing a click will simply stop
+		else {
+			addActionListener(e -> app.stopIfPlaying());
 		}
 	}
 
