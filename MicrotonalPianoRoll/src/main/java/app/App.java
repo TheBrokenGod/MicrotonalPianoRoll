@@ -24,6 +24,8 @@ import model.TrackWriter;
 
 class App extends JFrame {
 	
+	private static final long serialVersionUID = 1L;
+	
 	public static void main(String[] args) {
 		try {
 			new App();
@@ -32,8 +34,6 @@ class App extends JFrame {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
-
-	private static final long serialVersionUID = 1L;
 	
 	Track track;
 	Menu bar;
@@ -46,7 +46,6 @@ class App extends JFrame {
 	private boolean changed;
 
 	App(Track track) {
-		super("Microtonal Piano Roll :: ::");
 		JPanel root = new JPanel();
 		root.setLayout(new BoxLayout(root, BoxLayout.LINE_AXIS));
 		setContentPane(root);
@@ -61,6 +60,25 @@ class App extends JFrame {
 	
 	App() {
 		this(Const.defaultTrack());
+	}
+
+	public void setTrack(Track track) {
+		if(piano != null) {
+			synth.dispose();
+		}
+		this.track = track;
+		setJMenuBar(bar = new Menu(this, track));
+		synth = new Synth(track, synth != null ? synth.oscillator() : Synth.defaultOscillator());
+		piano = new Piano(this, track.numKeys);
+		roll = new Roll(track);
+		getContentPane().removeAll();
+		getContentPane().add(piano);
+		getContentPane().add(Box.createRigidArea(new Dimension(10, 1)));
+		getContentPane().add(roll);
+		setMeasure(0);
+		revalidate();
+		pack();
+		setLocationRelativeTo(null);
 	}
 	
 	private void setFile(File file) {
@@ -83,24 +101,6 @@ class App extends JFrame {
 			title += " :: Playing";
 		}
 		setTitle(title);
-	}
-
-	public void setTrack(Track track) {
-		if(piano != null) {
-			synth.dispose();
-		}
-		this.track = track;
-		setJMenuBar(bar = new Menu(this, track));
-		synth = new Synth(track, synth != null ? synth.oscillator() : Synth.defaultOscillator());
-		piano = new Piano(this, track.numKeys);
-		roll = new Roll(track);
-		getContentPane().removeAll();
-		getContentPane().add(piano);
-		getContentPane().add(Box.createRigidArea(new Dimension(10, 1)));
-		getContentPane().add(roll);
-		setMeasure(0);
-		pack();
-		setLocationRelativeTo(null);
 	}
 	
 	void newFile() {
