@@ -31,33 +31,31 @@ public class TrackWriter {
 	public void write(Track track) {
 		try {
 			document.writeStartDocument();
-			document.writeStartElement("track");
-			document.writeAttribute("lower", Double.toString(track.lowerFrequency));
-			document.writeAttribute("higher", Double.toString(track.higherFrequency));
-			document.writeAttribute("steps", Integer.toString(track.stepsInBetween));
-			document.writeAttribute("start", Integer.toString(track.lowestOffset));
-			document.writeAttribute("keys", Integer.toString(track.numKeys));
-			document.writeAttribute("bpm", Integer.toString(track.firstMeasure().getBPM()));
-			Integer bpm = track.firstMeasure().getBPM();
-			boolean writeBPM = false;
+			startElement("track");
+			// Audio synthesis
+			setAttribute("lower", track.lowerFrequency);
+			setAttribute("higher", track.higherFrequency);
+			setAttribute("steps", track.stepsInBetween);
+			setAttribute("start", track.lowestOffset);
+			setAttribute("keys", track.numKeys);
+			int bpm = track.firstMeasure().getBPM();
+			setAttribute("bpm", bpm);
+			// Measure does not get written to file
 			for(Measure measure : track) {
-				if(measure.getBPM() != bpm) {
-					bpm = measure.getBPM();
-					writeBPM = true;
-				}
 				for(Note note : measure) {
-					document.writeStartElement("note");
-					document.writeAttribute("length", note.length.name());
-					if(writeBPM) {
-						document.writeAttribute("bpm", Integer.toString(bpm));						
-						writeBPM = false;
+					startElement("note");
+					setAttribute("length", note.length.name());
+					// Save tempo change in the first note of the measure
+					if(measure.getBPM() != bpm) {
+						bpm = measure.getBPM();
+						setAttribute("bpm", bpm);						
 					}
-					document.writeCharacters(note.values().map(v -> v.toString()).collect(Collectors.joining(" ")));
-					document.writeEndElement();
-					
+					// Write note values as a string of space separated integers
+					setValue(note.values().map(v -> v.toString()).collect(Collectors.joining(" ")));
+					endElement();
 				}
 			}
-			document.writeEndElement();
+			endElement();
 			document.writeEndDocument();
 			serializer.serializeNode(document.getDocumentNode());
 			document.close();
@@ -66,5 +64,30 @@ public class TrackWriter {
 		catch (XMLStreamException | SaxonApiException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	private void startElement(String element) throws XMLStreamException {
+		document.writeStartElement(element);
+	}
+	
+	private void endElement() throws XMLStreamException {
+		document.writeEndElement();
+	}
+	
+	private void setAttribute(String name, double value) throws XMLStreamException {
+		document.writeAttribute(name, Double.toString(value));
+		
+	}
+	
+	private void setAttribute(String name, int value) throws XMLStreamException {
+		document.writeAttribute(name, Integer.toString(value));		
+	}
+	
+	private void setAttribute(String name, String value) throws XMLStreamException {
+		document.writeAttribute(name, value);
+	}
+	
+	private void setValue(String string) throws XMLStreamException {
+		document.writeCharacters(string);
 	}
 }
