@@ -40,15 +40,15 @@ class Menu extends JMenuBar {
 	}
 	
 	private void buildMenus() {
-		JMenu menu, sub;
+		JMenu menu, sub, sub2;
 		add(menu = new JMenu("Track"));
 		menu.add(buildMenuItem("New", app::newFile, KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Open", app::openFile, KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Save", app::saveFile, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Save as", app::saveFileAs, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
 		menu.addSeparator();
-		menu.add(buildMenuItem("Audio properties", app::setAudio, KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
-		menu.add(buildMenuItem("Unit oscillator", app::setOscillator, KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("Audio frequencies", app::setAudio, KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("Generating oscillator", app::setOscillator, KeyEvent.VK_G, KeyEvent.CTRL_DOWN_MASK));
 		JMenuItem item = new JMenuItem("Play");
 		item.addActionListener(e -> app.startOrStop());
 		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
@@ -68,26 +68,35 @@ class Menu extends JMenuBar {
 		sub.add(buildMenuItem("Previous", app::previousTempo, KeyEvent.VK_LEFT, KeyEvent.CTRL_DOWN_MASK));
 		sub.add(buildMenuItem("Next", app::nextTempo, KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK));
 		add(menu = new JMenu("Composition"));
-		menu.add(buildMenuItem("Write piano keys", app::writePianoKeysIntoRoll, KeyEvent.VK_ENTER, null));
-		menu.add(buildMenuItem("Release piano keys", app::releasePianoKeys, KeyEvent.VK_ESCAPE, null));
-		menu.addSeparator();
-		menu.add(sub = new JMenu("Resolution"));
+		menu.add(sub = new JMenu("Piano keys"));
+		sub.add(buildMenuItem("Write into measure", app::writePianoKeysIntoRoll, KeyEvent.VK_ENTER, null));
+		sub.add(buildMenuItem("Release", app::releasePianoKeys, KeyEvent.VK_ESCAPE, null));
+		sub.addSeparator();
+		sub.add(buildMenuItem("Move up", () -> app.piano.moveChordUp(), KeyEvent.VK_W, null));
+		sub.add(buildMenuItem("Move down", () -> app.piano.moveChordDown(), KeyEvent.VK_S, null));
+		sub.addSeparator();
+		sub.add(buildMenuItem("Move highest up", () -> app.piano.moveHighestKeyUp(), KeyEvent.VK_E, null));
+		sub.add(buildMenuItem("Move highest down", () -> app.piano.moveHighestKeyDown(), KeyEvent.VK_Q, null));
+		sub.add(buildMenuItem("Move lowest up", () -> app.piano.moveLowestKeyUp(), KeyEvent.VK_D, null));
+		sub.add(buildMenuItem("Move lowest down", () -> app.piano.moveLowestKeyDown(), KeyEvent.VK_A, null));
+		menu.add(sub = new JMenu("Roll of notes"));
+		sub.add(sub2 = new JMenu("Resolution"));
 		for(String note : NoteLength.NAMES_NORMAL) {
-			sub.add(buildRadioItem(app, note, group));			
+			sub2.add(buildRadioItem(app, note, group));
 		}
-		sub.addSeparator();
+		sub2.addSeparator();
 		for(String note : NoteLength.NAMES_THIRD) {
-			sub.add(buildRadioItem(app, note, group));
+			sub2.add(buildRadioItem(app, note, group));
 		}
+		sub2.addSeparator();
+		sub2.add(buildMenuItem("Increase", this::increaseResolution, KeyEvent.VK_UP, null));
+		sub2.add(buildMenuItem("Decrease", this::decreaseResolution, KeyEvent.VK_DOWN, null));
 		sub.addSeparator();
-		sub.add(buildMenuItem("Increase", this::increaseResolution, KeyEvent.VK_UP, null));
-		sub.add(buildMenuItem("Decrease", this::decreaseResolution, KeyEvent.VK_DOWN, null));
-		menu.add(sub = new JMenu("Measure"));
-		sub.add(buildMenuItem("Insert", app::insertMeasure, KeyEvent.VK_INSERT, null));
-		sub.add(buildMenuItem("Delete", app::deleteMeasure, KeyEvent.VK_DELETE, null));
-		menu.add(sub = new JMenu("Tempo change"));
-		sub.add(buildMenuItem("Set", app::setTempoChange, KeyEvent.VK_INSERT, KeyEvent.CTRL_DOWN_MASK));
-		sub.add(buildMenuItem("Clear", app::clearTempoChange, KeyEvent.VK_DELETE, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("Insert measure", app::insertMeasure, KeyEvent.VK_INSERT, null));
+		sub.add(buildMenuItem("Delete measure", app::deleteMeasure, KeyEvent.VK_DELETE, null));
+		sub.addSeparator();
+		sub.add(buildMenuItem("Set new tempo", app::setTempoChange, KeyEvent.VK_INSERT, KeyEvent.CTRL_DOWN_MASK));
+		sub.add(buildMenuItem("Clear tempo", app::clearTempoChange, KeyEvent.VK_DELETE, KeyEvent.CTRL_DOWN_MASK));
 	}
 	
 	private JMenuItem buildMenuItem(String text, Runnable action, Integer keyCode, Integer modifiers) {

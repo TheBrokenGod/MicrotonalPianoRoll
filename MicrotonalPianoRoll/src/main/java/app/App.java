@@ -184,8 +184,10 @@ class App extends JFrame {
 	void setOscillator() {
 		String value = (String) JOptionPane.showInputDialog(this, "Please select the unit oscillator", null, JOptionPane.QUESTION_MESSAGE, null, Synth.availableOscillators(), synth.oscillator());
 		if(value != null) {
+			List<Integer> keys = piano.grabActiveKeys();
 			synth.dispose();
 			synth = new Synth(track, value);
+			piano.activateKeys(keys);
 		}
 	}
 	
@@ -286,7 +288,7 @@ class App extends JFrame {
 	}
 	
 	void setTempoChange() {
-		String input = JOptionPane.showInputDialog(this, "Please insert new tempo", currentMeasure().getBPM());
+		String input = JOptionPane.showInputDialog(this, "Please insert the new tempo", currentMeasure().getBPM());
 		try {
 			int bpm = Integer.parseInt(input);
 			if(bpm > 0) {
@@ -323,7 +325,7 @@ class App extends JFrame {
 		bar.setMeasure(measure, measure == 0 || currentMeasure().getBPM() != track.measure(measure - 1).getBPM());
 	}
 	
-	// TODO FIX periodical
+	// TODO FIX
 	void resolutionChanged(String resolution) {
 		Measure measure = track.measure(this.measure);
 		// Remove empty notes at the end of the measure
@@ -356,10 +358,10 @@ class App extends JFrame {
 
 	public void writePianoKeysIntoRoll() {
 		// Do nothing if the user is still holding a piano key
-		if(piano.isKeyBeingPressed()) {
+		if(piano.isPianoKeyBeingPressed()) {
 			return;
 		}
-		List<Integer> keys = piano.readActiveKeys();
+		List<Integer> keys = piano.grabActiveKeys();
 		Note note = currentMeasure().firstEmptyNote();
 		if(note != null) {
 			// Register the new note and reload measure
@@ -369,10 +371,10 @@ class App extends JFrame {
 	}
 	
 	public void releasePianoKeys() {
-		if(piano.isKeyBeingPressed()) {
+		if(piano.isPianoKeyBeingPressed()) {
 			return;
 		}
-		piano.readActiveKeys();
+		piano.grabActiveKeys();
 	}
 	
 	private void noteChanged(Note note, int value, boolean selected) {

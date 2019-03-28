@@ -66,11 +66,11 @@ class Player {
 		double time = this.startTime;
 		try {
 			// Disable piano input during playback
-			SwingUtilities.invokeAndWait(() -> app.piano.rebuild());
+			SwingUtilities.invokeAndWait(() -> app.piano.rebuildKeys());
 			for(int i = app.measure; i < app.track.measuresCount(); i++) {
 				for(Note note : app.track.measure(i)) {
 					// Show played keys as pressed
-					SwingUtilities.invokeAndWait(() -> app.piano.press(note));
+					SwingUtilities.invokeAndWait(() -> app.piano.playPress(note));
 					app.synth.sleepUntil(time += note.length.absolute());
 				}
 			}
@@ -80,7 +80,7 @@ class Player {
 		finally {
 			SwingUtilities.invokeLater(() -> {
 				app.stopIfPlaying();
-				app.piano.rebuild();
+				app.piano.rebuildKeys();
 			});
 		}
 	}

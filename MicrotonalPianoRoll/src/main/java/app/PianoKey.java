@@ -12,29 +12,29 @@ class PianoKey extends JToggleButton implements MouseListener {
 	private static final long serialVersionUID = 1L;
 	private static enum KeyState {
 		Inactive, InactiveFocused, InactiveToActive, ActiveToInactive, ActiveFocused, Active
-	}	
-	private static PianoKey cursorPos = null;
-	static PianoKey pressedOn = null;
+	}
 
 	final int index;
-	private final Synth synth;
+	private final Piano piano;
+	private final App app;
 	private KeyState state;
 	
-	PianoKey(int index, App app) {
+	PianoKey(int index, Piano piano) {
 		this.index = index;
-		this.synth = app.synth;
+		this.piano = piano;
+		this.app = piano.app;
 		setState(KeyState.Inactive);
 		setBorder(Const.KEY_BORDER);
 		setFocusable(false);
-		// If editing mode enable keyboard
+		// If editing enable key
 		if(!app.isPlaying()) {
 			addMouseListener(this);
-			cursorPos = null;
-			pressedOn = null;
+			piano.cursorPos = null;
+			piano.pressedOn = null;
 		}
-		// If playing a click will simply stop
+		// If playing one click will stop
 		else {
-			addActionListener(e -> app.stopIfPlaying());
+			addActionListener(e -> piano.app.stopIfPlaying());
 		}
 	}
 
@@ -47,21 +47,44 @@ class PianoKey extends JToggleButton implements MouseListener {
 		return state == KeyState.Active || state == KeyState.ActiveFocused;
 	}
 
-	void setInactive() {
-		if(state == KeyState.Active) {
-			setState(KeyState.Inactive);
+	void setActive(boolean activate) {
+		if(activate) {
+			switch(state)
+			{
+			case Inactive:
+				app.synth.play(index);
+				setState(KeyState.Active);
+				break;
+			case InactiveFocused:
+				setState(KeyState.ActiveFocused);
+				app.synth.play(index);
+				break;
+			default:
+				throw new RuntimeException();
+			}
 		}
-		else if(state == KeyState.ActiveFocused) {
-			setState(KeyState.InactiveFocused);
+		else {
+			switch(state)
+			{
+			case Active:
+				app.synth.stop(index);
+				setState(KeyState.Inactive);
+				break;
+			case ActiveFocused:
+				setState(KeyState.InactiveFocused);
+				app.synth.stop(index);
+				break;
+			default:
+				throw new RuntimeException();
+			}
 		}
-		synth.stop(index);
 	}
 
-	void press() {
+	void playPress() {
 		setState(KeyState.Active);
 	}
 
-	void release() {
+	void playRelease() {
 		setState(KeyState.Inactive);		
 	}
 	
@@ -96,8 +119,8 @@ class PianoKey extends JToggleButton implements MouseListener {
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		cursorPos = this;
-		if(pressedOn == null) {
+		piano.cursorPos = this;
+		if(piano.pressedOn == null) {
 			switch(state) 
 			{
 			case Inactive:
@@ -115,11 +138,11 @@ class PianoKey extends JToggleButton implements MouseListener {
 			{
 			case Inactive:
 				setState(KeyState.InactiveToActive);
-				synth.play(index);
+				app.synth.play(index);
 				break;
 			case Active:
 				setState(KeyState.ActiveToInactive);
-				synth.stop(index);
+				app.synth.stop(index);
 				break;
 			default:
 				throw new RuntimeException();
@@ -129,16 +152,16 @@ class PianoKey extends JToggleButton implements MouseListener {
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		cursorPos = null;
+		piano.cursorPos = null;
 		switch(state)
 		{
 		case InactiveToActive:
-			synth.stop(index);
+			app.synth.stop(index);
 		case InactiveFocused:
 			setState(KeyState.Inactive);
 			break;
 		case ActiveToInactive:
-			synth.play(index);
+			app.synth.play(index);
 		case ActiveFocused:
 			setState(KeyState.Active);
 			break;
@@ -152,16 +175,16 @@ class PianoKey extends JToggleButton implements MouseListener {
 		if(e.getButton() != MouseEvent.BUTTON1) {
 			return;
 		}
-		pressedOn = this;
+		piano.pressedOn = this;
 		switch(state)
 		{
 		case InactiveFocused:
 			setState(KeyState.InactiveToActive);
-			synth.play(index);
+			app.synth.play(index);
 			break;
 		case ActiveFocused:
 			setState(KeyState.ActiveToInactive);
-			synth.stop(index);
+			app.synth.stop(index);
 			break;
 		default:
 			throw new RuntimeException();
@@ -173,19 +196,19 @@ class PianoKey extends JToggleButton implements MouseListener {
 		if(e.getButton() != MouseEvent.BUTTON1) {
 			return;
 		}
-		pressedOn = null;
-		if(cursorPos == null) {
+		piano.pressedOn = null;
+		if(piano.cursorPos == null) {
 			return;
 		}
-		switch(cursorPos.state)
+		switch(piano.cursorPos.state)
 		{
 		case InactiveToActive:
-			cursorPos.setState(KeyState.ActiveFocused);
-			cursorPos.setSelected(true);
+			piano.cursorPos.setState(KeyState.ActiveFocused);
+			piano.cursorPos.setSelected(true);
 			break;
 		case ActiveToInactive:
-			cursorPos.setState(KeyState.InactiveFocused);
-			cursorPos.setSelected(false);
+			piano.cursorPos.setState(KeyState.InactiveFocused);
+			piano.cursorPos.setSelected(false);
 			break;
 		default:
 			throw new RuntimeException();
