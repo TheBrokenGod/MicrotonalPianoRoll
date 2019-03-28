@@ -5,9 +5,9 @@ import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.JToggleButton;
+import javax.swing.JButton;
 
-class PianoKey extends JToggleButton implements MouseListener {
+class PianoKey extends JButton implements MouseListener {
 	
 	private static final long serialVersionUID = 1L;
 	private static enum KeyState {
@@ -204,11 +204,9 @@ class PianoKey extends JToggleButton implements MouseListener {
 		{
 		case InactiveToActive:
 			piano.cursorPos.setState(KeyState.ActiveFocused);
-			piano.cursorPos.setSelected(true);
 			break;
 		case ActiveToInactive:
 			piano.cursorPos.setState(KeyState.InactiveFocused);
-			piano.cursorPos.setSelected(false);
 			break;
 		default:
 			throw new RuntimeException();
