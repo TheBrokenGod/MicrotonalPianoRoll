@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.apache.commons.math3.util.ArithmeticUtils;
 import org.xml.sax.SAXException;
 
 import model.Measure;
@@ -325,7 +326,6 @@ class App extends JFrame {
 		bar.setMeasure(measure, measure == 0 || currentMeasure().getBPM() != track.measure(measure - 1).getBPM());
 	}
 	
-	// TODO FIX
 	void resolutionChanged(String resolution) {
 		Measure measure = track.measure(this.measure);
 		// Remove empty notes at the end of the measure
@@ -333,16 +333,19 @@ class App extends JFrame {
 		for(int i = measure.notesCount() - 1; i >= 0 && measure.note(i).isEmpty(); i--) {
 			removed.add(0, measure.remove(i));
 		}
-		if(removed.size() > 0) {
-			// Check if empty space can be filled with notes at new resolution
-			if(10 * NoteLength.inverse(resolution) % (int)Math.round(10 / measure.freeSpace()) == 0) {
-				measure.fill(resolution);
-				setFileModified(true);
-			}
-			else {
-				// Otherwise restore
-				measure.addAll(removed);
-			}
+		// Find minimum calculus unit which fits all the defined lengths
+		int minLength = NoteLength.NAME_TO_INV_LEN.values().stream().reduce((l1, l2) -> ArithmeticUtils.lcm(l1, l2)).get();
+		// Calculate the available space in terms of the minimum unit
+		int availableSpace = removed.stream().mapToInt(note -> minLength / note.length.inverse()).sum();
+		// If the new resolution fits exactly then alter measure
+		int resolutionSize = minLength / NoteLength.inverse(resolution);
+		if(availableSpace > 0 && availableSpace % resolutionSize == 0) {
+			measure.fill(resolution);
+			setFileModified(true);
+		}
+		else {
+			// If not restore
+			measure.addAll(removed);
 		}
 		setMeasure(this.measure);	
 	}

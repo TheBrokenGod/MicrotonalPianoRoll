@@ -1,6 +1,5 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,19 +10,16 @@ public class NoteLength {
 	
 	public static final List<String> NAMES_NORMAL = Collections.unmodifiableList(Arrays.asList("1", "2", "4", "8", "16", "32"));
 	public static final List<String> NAMES_THIRD = Collections.unmodifiableList(Arrays.asList("2T", "4T", "8T", "16T", "32T"));
-	private static final List<String> NAMES = new ArrayList<String>();
-	private static final Map<String, Integer> NAME_TO_INV_LEN = new HashMap<>();
+	public static final Map<String, Integer> NAME_TO_INV_LEN;
 	static {
-		NAMES.addAll(NAMES_NORMAL);
-		NAMES.addAll(NAMES_THIRD);
-		for(String name : NAMES) {
-			if(!name.endsWith("T")) {
-				NAME_TO_INV_LEN.put(name, Integer.parseInt(name));
-			}
-			else {
-				NAME_TO_INV_LEN.put(name, Math.round(3.f * Integer.parseInt(name.substring(0, name.length() - 1)) / 2.f));
-			}
-		};
+		Map<String, Integer> nameToInvLen = new HashMap<>();
+		for(String name : NAMES_NORMAL) {
+			nameToInvLen.put(name, Integer.parseInt(name));
+		}
+		for(String name : NAMES_THIRD) {
+			nameToInvLen.put(name, Math.round(3.f * Integer.parseInt(name.substring(0, name.length() - 1)) / 2.f));
+		}
+		NAME_TO_INV_LEN = Collections.unmodifiableMap(nameToInvLen);
 	}
 	
 	private final String name;
@@ -39,6 +35,10 @@ public class NoteLength {
 	
 	public double absolute() {
 		return 240.0 / measure.getBPM() / NAME_TO_INV_LEN.get(name);
+	}
+	
+	public int inverse() {
+		return inverse(name);
 	}
 	
 	public static int inverse(String name) {
