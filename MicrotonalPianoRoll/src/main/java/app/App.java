@@ -1,12 +1,13 @@
 package app;
 
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
@@ -47,7 +48,7 @@ class App extends JFrame {
 	private File file;
 	private boolean modified;
 
-	App(Track track) {
+	App(Track track) throws IOException {
 		JPanel root = new JPanel();
 		root.setLayout(new BoxLayout(root, BoxLayout.LINE_AXIS));
 		setContentPane(root);
@@ -55,12 +56,11 @@ class App extends JFrame {
 		setTrack(track);
 		setFile(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		Image icon = getToolkit().getImage(getClass().getResource("/app/icon.png"));
-		setIconImage(icon);
+		setIconImage(ImageIO.read(getClass().getResource("/app/icon.png")));
 		setVisible(true);
 	}
 	
-	App() {
+	App() throws IOException {
 		this(Const.defaultTrack());
 	}
 
