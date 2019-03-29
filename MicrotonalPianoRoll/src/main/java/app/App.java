@@ -82,8 +82,8 @@ class App extends JFrame {
 		pack();
 		// Keep inside screen boundaries
 		Dimension frameSize = new Dimension(
-			Math.min(getSize().width, Math.round(0.9f * Toolkit.getDefaultToolkit().getScreenSize().width)),
-			Math.min(getSize().height, Math.round(0.9f * Toolkit.getDefaultToolkit().getScreenSize().height))
+			Math.min(getSize().width, Math.round(Const.APP_MAX_SCREEN_PERC * Toolkit.getDefaultToolkit().getScreenSize().width)),
+			Math.min(getSize().height, Math.round(Const.APP_MAX_SCREEN_PERC * Toolkit.getDefaultToolkit().getScreenSize().height))
 		);
 		setSize(frameSize);
 		setLocationRelativeTo(null);
