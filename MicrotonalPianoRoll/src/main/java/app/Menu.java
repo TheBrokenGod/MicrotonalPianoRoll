@@ -44,6 +44,7 @@ class Menu extends JMenuBar {
 		add(menu = new JMenu("File"));
 		menu.add(buildMenuItem("New", app::newFile, KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Open", app::openFile, KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
+		menu.add(buildMenuItem("Reload", app::reloadFile, KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Save", app::saveFile, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
 		menu.add(buildMenuItem("Save as", app::saveFileAs, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
 		menu.addSeparator();
@@ -54,7 +55,7 @@ class Menu extends JMenuBar {
 		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
 		menu.add(item);
 		menu.addSeparator();
-		menu.add(buildMenuItem("Exit", () -> System.exit(0), KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK));
+		menu.add(buildMenuItem("Exit", app::exit, KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK));
 		
 		add(menu = new JMenu("Piano keys"));
 		menu.add(buildMenuItem("Write into measure", app::writePianoKeysIntoRoll, KeyEvent.VK_ENTER, null));

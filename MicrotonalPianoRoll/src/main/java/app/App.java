@@ -2,6 +2,8 @@ package app;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,7 +27,7 @@ import model.Track;
 import model.TrackReader;
 import model.TrackWriter;
 
-class App extends JFrame {
+class App extends JFrame implements WindowListener {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -48,20 +50,31 @@ class App extends JFrame {
 	private File file;
 	private boolean modified;
 
-	App(Track track) throws IOException {
+	App(Track track) {
 		JPanel root = new JPanel();
 		root.setLayout(new BoxLayout(root, BoxLayout.LINE_AXIS));
 		setContentPane(root);
 		player = new Player(this);
 		setTrack(track);
 		setFile(null);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setIconImage(ImageIO.read(getClass().getResource("/app/icon.png")));
+		try {
+			setIconImage(ImageIO.read(getClass().getResource("/app/icon.png")));
+		}
+		catch(IOException e) {
+			throw new RuntimeException(e);
+		}
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		addWindowListener(this);
 		setVisible(true);
 	}
 	
-	App() throws IOException {
+	App() {
 		this(Const.defaultTrack());
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		exit();
 	}
 
 	public void setTrack(Track track) {
@@ -125,14 +138,23 @@ class App extends JFrame {
 		JFileChooser chooser = new JFileChooser();
 		chooser.setFileFilter(Const.FILE_TYPE_FILTER);
 		if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-			File file = chooser.getSelectedFile();
-			try {
-				setTrack(new TrackReader(file).read());
-				setFile(file);
-			}
-			catch (SAXException e) {
-				JOptionPane.showMessageDialog(this, "Not a valid file", file.getName(), JOptionPane.ERROR_MESSAGE);
-			}
+			doOpenFile(chooser.getSelectedFile());
+		}
+	}
+	
+	void doOpenFile(File file) {
+		try {
+			setTrack(new TrackReader(file).read());
+			setFile(file);
+		}
+		catch (SAXException e) {
+			JOptionPane.showMessageDialog(this, "Not a valid file", file.getName(), JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	void reloadFile() {
+		if(file != null) {
+			doOpenFile(file);
 		}
 	}
 	
@@ -210,6 +232,13 @@ class App extends JFrame {
 		if(player.isPlaying()) {
 			startOrStop();
 		}
+	}
+	
+	void exit() {
+		if(modified && JOptionPane.showConfirmDialog(this, "Do you want so save changes?", null, JOptionPane.YES_NO_OPTION) == 0) {
+			saveFile();
+		}
+		System.exit(0);
 	}
 	
 	void previousMeasure() {
@@ -388,5 +417,29 @@ class App extends JFrame {
 			note.remove(value);
 		}
 		setFileModified(true);
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {	
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
 	}
 }

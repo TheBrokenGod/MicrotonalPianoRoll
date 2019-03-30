@@ -1,38 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<track lower="27.5" higher="55" steps="12" start="18" keys="30" bpm="177">
+<track lower="440.0" higher="880.0" steps="12" start="-30" keys="26" bpm="190">
 
     <note length="1">12</note>
-    
     <note length="4">4</note>
     <note length="4">7</note>
     <note length="4">11</note>
     <note length="4">4</note>
-    
     <note length="2">12</note>
     <note length="4">5</note>
     <note length="4">12</note>
-    
     <note length="2">13</note>
     <note length="4">6</note>
     <note length="4">13</note>
-    
     <note length="2">12</note>
     <note length="2">8</note>
-    
     <note length="4">4</note>
     <note length="4">7</note>
     <note length="4">11</note>
     <note length="4">4</note>
-    
     <note length="2">12</note>
     <note length="4">5</note>
     <note length="4">12</note>
-    
     <note length="2">13</note>
     <note length="4">6</note>
     <note length="4">13</note>
     
-    <note length="8T" bpm="118">5</note>
+    <note length="8T" bpm="114">5</note>
     <note length="8T">12</note>
     <note length="8T">19</note>
     <note length="8T">5</note>
@@ -75,14 +68,52 @@
     <note length="8T">5</note>
     <note length="8T">12</note>
     <note length="8T">19</note>
-    <note length="8T">6</note>
-    <note length="8T">13</note>
-    <note length="8T">6</note>
-    <note length="8T">13</note>
-    <note length="8T">6</note>
-    <note length="8T">13</note>
+    <note length="8T">6 13</note>
+    <note length="8T">13 20</note>
+    <note length="8T">6 13</note>
+    <note length="8T">13 20</note>
+    <note length="8T">6 13</note>
+    <note length="8T">13 20</note>
     
-    <note length="1" bpm="150">5 12 17</note>
+    <note length="4">5</note>
+    <note length="4">12</note>
+    <note length="4">17</note>
+    <note length="4">24</note>
+    <note length="4">22</note>
+    <note length="4">20</note>
+    <note length="4T">18</note>
+    <note length="4T">13</note>
+    <note length="4T">18</note>
+	<note length="4">5</note>
+    <note length="4">12</note>
+    <note length="4">17</note>
+    <note length="4">24</note>
+    <note length="4">20</note>
+    <note length="4">17</note>
+    <note length="4T">18</note>
+    <note length="4T">13</note>
+    <note length="4T">18</note>
+    
+	<note length="4">5</note>
+    <note length="4">12</note>
+    <note length="4">17</note>
+    <note length="4">24</note>
+    <note length="4">24</note>
+    <note length="4">22</note>
+    <note length="4T">18</note>
+    <note length="4T">13</note>
+    <note length="4T">18</note>
+	<note length="4">5</note>
+    <note length="4">12</note>
+    <note length="4">17</note>
+    <note length="4">24</note>
+    <note length="4">22</note>
+    <note length="4">17</note>
+    <note length="4T">18</note>
+    <note length="4T">13</note>
+    <note length="4T">18</note>
+    
+    <note length="1" bpm="156">5 12 17</note>
     <note length="1">13 20 25</note>
     <note length="1">5 12 17</note>
     <note length="1">4 11 16</note>
@@ -93,10 +124,101 @@
     <note length="8">3 10 15</note>
     <note length="8">4 11 16</note>
     <note length="2">4 11 16</note>
-    
     <note length="1">5 12 17</note>
     <note length="1">13 20 25</note>
     <note length="1">5 12 17</note>
     <note length="2">3 10 15</note>
     <note length="2">4 11 16</note>
+    
+    <note length="4" bpm="162">5</note>
+    <note length="4">12</note>
+    <note length="4">17</note>
+    <note length="4">12</note>
+    <note length="4">13</note>
+    <note length="4">20</note>
+    <note length="4">25</note>
+    <note length="4">20</note>
+    <note length="4">5</note>
+    <note length="4">12</note>
+    <note length="4">17</note>
+    <note length="4">12</note>
+    <note length="4">3</note>
+    <note length="4">10</note>
+    <note length="4">4</note>
+    <note length="4">11</note>
+    <note length="4">5</note>
+    <note length="4">12</note>
+    <note length="4">17</note>
+    <note length="4">12</note>
+    <note length="4">1</note>
+    <note length="4">8</note>
+    <note length="4">13</note>
+    <note length="4">8</note>
+    <note length="4">5</note>
+    <note length="4">12</note>
+    <note length="4">17</note>
+    <note length="4">12</note>
+    <note length="4">3</note>
+    <note length="2">10</note>
+    <note length="4">3</note>
+    
+    <note length="4">5</note>
+    <note length="4">12</note>
+    <note length="4">17</note>
+    <note length="4">12</note>
+    <note length="4">13</note>
+    <note length="4">20</note>
+    <note length="4">25</note>
+    <note length="4">20</note>
+    <note length="4">5</note>
+    <note length="4">12</note>
+    <note length="4">17</note>
+    <note length="4">12</note>
+    <note length="4">3</note>
+    <note length="4">10</note>
+    <note length="4">4</note>
+    <note length="4">11</note>
+    <note length="4">5</note>
+    <note length="4">12</note>
+    <note length="4">17</note>
+    <note length="4">12</note>
+    <note length="4">1</note>
+    <note length="4">8</note>
+    <note length="4">13</note>
+    <note length="4">8</note>
+    <note length="4">5</note>
+    <note length="4">12</note>
+    <note length="4">17</note>
+    <note length="4">12</note> 
+    <note length="4">3</note>
+    <note length="4">7</note>
+    <note length="4">8</note>
+    <note length="4">10</note>
+    
+    <note length="2" bpm="190">12</note>
+    <note length="2">8</note>
+    <note length="4">4</note>
+    <note length="4">7</note>
+    <note length="4">11</note>
+    <note length="4">4</note>
+    <note length="2">12</note>
+    <note length="4">5</note>
+    <note length="4">12</note>
+    <note length="2">13</note>
+    <note length="4">6</note>
+    <note length="4">13</note>
+    <note length="1">12</note>
+    <note length="4">4</note>
+    <note length="4">7</note>
+    <note length="4">11</note>
+    <note length="4">4</note>
+    <note length="2">12</note>
+    <note length="4">5</note>
+    <note length="4">12</note>
+    <note length="2">13</note>
+    <note length="4">6</note>
+    <note length="4">13</note>
+    <note length="4">5</note>
+    <note length="4"></note>
+    <note length="2"></note>
 </track>
